@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:fresto_apps/components/food_card.dart';
+import 'package:fresto_apps/components/header_app_bar_button.dart';
+import 'package:fresto_apps/components/home_vertical_card.dart';
 import 'package:fresto_apps/components/overlapping_sliver_app_bar_delegate.dart';
-import 'package:fresto_apps/components/text_and_image_progress_animation.dart';
+import 'package:fresto_apps/models_data/current_user_data.dart';
+import 'package:fresto_apps/utils/constants.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key key}) : super(key: key);
@@ -10,9 +15,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final double expandedHeight = 152;
-  final double cardHeight = 240.0;
-  final double cardWidth = 160.0;
+  void _signOut() {
+    Provider.of<CurrentUserData>(context).signOutUser(context);
+  }
 
   Widget _appBar(BuildContext context) {
     return SliverPersistentHeader(
@@ -68,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: HeaderAppBarButton(
                         icon: Icons.exit_to_app,
                         text: "Sign-out",
+                        onTap: _signOut,
                       ),
                     ),
                   ],
@@ -80,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _section1() {
+  Widget _topSection() {
     return SliverToBoxAdapter(
       child: Container(
         height: cardHeight,
@@ -88,84 +94,18 @@ class _HomeScreenState extends State<HomeScreen> {
           scrollDirection: Axis.horizontal,
           itemCount: 5,
           itemBuilder: (context, index) {
-            return Container(
-              width: cardWidth,
-              child: Card(
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      Expanded(
-                        flex: 0,
-                        child: TextAndImageProgressAnimation(
-                          height: 15.0,
-                        ),
-                      ),
-                      Expanded(
-                        flex: 0,
-                        child: TextAndImageProgressAnimation(
-                          height: 15.0,
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: TextAndImageProgressAnimation(),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+            return HomeVerticalCard();
           },
         ),
       ),
     );
   }
 
-  Widget _section2() {
+  Widget _bottomSection() {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (context, int) {
-          return Card(
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                    flex: 0,
-                    child: TextAndImageProgressAnimation(
-                      height: 72.0,
-                      width: 72.0,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 0,
-                    child: SizedBox(
-                      width: 8.0,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        TextAndImageProgressAnimation(height: 15.0),
-                        TextAndImageProgressAnimation(
-                          height: 15.0,
-                          width: 72.0,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
+          return FoodCard();
         },
         childCount: 8,
       ),
@@ -183,49 +123,8 @@ class _HomeScreenState extends State<HomeScreen> {
               height: expandedHeight / 3.2,
             ),
           ),
-          _section1(),
-          _section2(),
-        ],
-      ),
-    );
-  }
-}
-
-class HeaderAppBarButton extends StatelessWidget {
-  final IconData icon;
-  final String text;
-
-  HeaderAppBarButton({this.icon, this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Expanded(
-            flex: 1,
-            child: Container(
-              alignment: Alignment.center,
-              child: Text(
-                text,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Icon(
-              icon,
-              size: 30.0,
-              color: Colors.green,
-            ),
-          ),
+          _topSection(),
+          _bottomSection(),
         ],
       ),
     );

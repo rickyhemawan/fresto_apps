@@ -7,8 +7,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:fresto_apps/main.dart';
+import 'package:mockito/mockito.dart';
+
+class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {

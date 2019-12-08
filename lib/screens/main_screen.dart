@@ -2,6 +2,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fresto_apps/components/bottom_navigation_icon.dart';
+import 'package:fresto_apps/components/fab_with_notifications.dart';
 import 'package:fresto_apps/screens/account_screen.dart';
 import 'package:fresto_apps/screens/home_screen.dart';
 import 'package:fresto_apps/screens/merchants_screen.dart';
@@ -49,6 +50,7 @@ class _MainScreenState extends State<MainScreen> {
           child: _bodyList[_page],
           bucket: _bucket,
         ),
+        floatingActionButton: FABWithNotifications(),
       ),
     );
   }

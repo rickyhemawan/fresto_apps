@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fresto_apps/models_data/current_user_data.dart';
+import 'package:provider/provider.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({Key key}) : super(key: key);
@@ -12,6 +14,10 @@ class _AccountScreenState extends State<AccountScreen> {
       title: Text("Account"),
       floating: true,
     );
+  }
+
+  void _signOut() {
+    Provider.of<CurrentUserData>(context).signOutUser(context);
   }
 
   @override
@@ -48,7 +54,7 @@ class _AccountScreenState extends State<AccountScreen> {
                   color: Colors.red,
                   textColor: Colors.white,
                   child: Text("Sign Out"),
-                  onPressed: () {},
+                  onPressed: _signOut,
                 ),
               ),
             ],
