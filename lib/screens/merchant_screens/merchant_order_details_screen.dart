@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fresto_apps/components/food_card.dart';
@@ -7,19 +6,38 @@ import 'package:fresto_apps/components/title_and_subtitle_row_text.dart';
 import 'package:fresto_apps/utils/constants.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
 
-class OrderScreen extends StatelessWidget {
+class MerchantOrderDetailsScreen extends StatelessWidget {
+  final OrderDay orderDay;
+  MerchantOrderDetailsScreen({this.orderDay = OrderDay.today});
+
   final _payHalf = "Pay Half";
   final _payFull = "Pay Full";
   final _picked = "Pay Half";
 
   Widget _foodList() {
-    return ListView.builder(
-      itemBuilder: (context, index) {
-        return FoodCardWithQuantity();
-      },
-      itemCount: 1,
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+    return Column(
+      children: <Widget>[
+        Container(
+          padding: EdgeInsets.all(8.0),
+          width: double.infinity,
+          child: Text(
+            'Product Details',
+            textAlign: TextAlign.start,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16.0,
+            ),
+          ),
+        ),
+        ListView.builder(
+          itemBuilder: (context, index) {
+            return FoodCardWithQuantity();
+          },
+          itemCount: 1,
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+        )
+      ],
     );
   }
 
@@ -35,35 +53,16 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
-  Widget _merchantDetailsSection(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        ListTile(
-          onTap: () => Navigator.pushNamed(context, kMerchantDetailScreenRoute),
-          leading: CachedNetworkImage(
-            imageUrl: kDummyMerchantImage,
-            fit: BoxFit.fill,
-          ),
-          title: Text(kDummyMerchantName),
-          subtitle: Text(
-            kDummyDescription,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          isThreeLine: true,
-        ),
-        ListTile(
-          title: Text(
-            "Address",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          subtitle: Text(kDummyMerchantAddress),
-          trailing: Icon(
-            Icons.location_on,
-            color: Colors.orange,
-          ),
-        ),
-      ],
+  Widget _paymentMethodSection() {
+    return InformationCard(
+      icon: Icons.attach_money,
+      color: Colors.green,
+      title: 'Payment Method',
+      content: 'OVO',
+      showViewIcon: false,
+      onPressed: () {
+        Fluttertoast.showToast(msg: 'Cannot Change Date Once being ordered');
+      },
     );
   }
 
@@ -99,16 +98,39 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
-  Widget _paymentMethodSection() {
-    return InformationCard(
-      icon: Icons.attach_money,
-      color: Colors.green,
-      title: 'Payment Method',
-      content: 'OVO',
-      showViewIcon: false,
-      onPressed: () {
-        Fluttertoast.showToast(msg: 'Cannot Change Date Once being ordered');
-      },
+  Widget _customerInfoSection() {
+    return Card(
+      margin: EdgeInsets.symmetric(
+        horizontal: 8.0,
+        vertical: 4.0,
+      ),
+      child: Column(
+        children: <Widget>[
+          Text(
+            'Customer Information',
+            textAlign: TextAlign.start,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16.0,
+            ),
+          ),
+          TitleAndSubtitleRowText(
+            title: "Name",
+            description: "John Doe",
+            fontSize: 16.0,
+          ),
+          TitleAndSubtitleRowText(
+            title: "Email Address",
+            description: "Johndoe@email.com",
+            fontSize: 16.0,
+          ),
+          TitleAndSubtitleRowText(
+            title: "Phone Number",
+            description: "+62812345678901",
+            fontSize: 16.0,
+          ),
+        ],
+      ),
     );
   }
 
@@ -147,9 +169,17 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
-  Widget _confirmButtonSection(context) {
+  Widget _confirmButtonSection(BuildContext context, bool enableTracking) {
+    Function _trackingEnabled = () {
+      Navigator.pushNamed(context, kMerchantTrackClientScreenRoute);
+    };
+
+    Function _trackingDisabled = () {
+      Fluttertoast.showToast(msg: "Can't show user location now");
+    };
+
     return Container(
-      color: Colors.red,
+      color: enableTracking ? Colors.green : Colors.grey,
       padding: EdgeInsets.all(8.0),
       margin: EdgeInsets.symmetric(
         vertical: 4.0,
@@ -158,11 +188,11 @@ class OrderScreen extends StatelessWidget {
       width: double.infinity,
       alignment: Alignment.center,
       child: InkWell(
-          onTap: () => Navigator.pop(context),
+          onTap: enableTracking ? _trackingEnabled : _trackingDisabled,
           child: Text(
-            "Cancel Reservation",
+            "Show User Location",
             style: TextStyle(
-              color: Colors.white,
+              color: enableTracking ? Colors.white : Colors.grey[700],
               fontWeight: FontWeight.bold,
               fontSize: 20.0,
             ),
@@ -170,22 +200,12 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
-  Widget _sectionTitle(BuildContext context, String title,
-      {EdgeInsetsGeometry margin}) {
-    return Container(
-      margin: margin ?? EdgeInsets.fromLTRB(16.0, 16.0, 8.0, 4.0),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.title,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    bool enableTracking = this.orderDay == OrderDay.today;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Reservation Details'),
+        title: Text('Order Detail'),
       ),
       body: Container(
         child: ListView(
@@ -194,12 +214,10 @@ class OrderScreen extends StatelessWidget {
           children: <Widget>[
             _timeSection(),
             _paymentMethodSection(),
-            _sectionTitle(context, "Restaurant Details"),
-            _merchantDetailsSection(context),
-            _sectionTitle(context, "Product Details"),
             _paymentDetailsSection(),
             _downPaymentSection(),
-            _confirmButtonSection(context),
+            _customerInfoSection(),
+            _confirmButtonSection(context, enableTracking),
           ],
         ),
       ),

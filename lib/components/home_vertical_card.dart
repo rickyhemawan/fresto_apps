@@ -47,6 +47,7 @@ class HomeVerticalCard extends StatelessWidget {
       width: cardWidth,
       child: GestureDetector(
         onTap: () {
+          Navigator.pushNamed(context, kMerchantDetailScreenRoute);
           Fluttertoast.showToast(
             msg: "Vertical Card Tapped!",
             gravity: ToastGravity.CENTER,

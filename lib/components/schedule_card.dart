@@ -6,9 +6,15 @@ class InformationCard extends StatelessWidget {
   final Function onPressed;
   final Color color;
   final IconData icon;
+  final bool showViewIcon;
 
   InformationCard(
-      {this.title, this.content, this.onPressed, this.color, this.icon});
+      {this.title,
+      this.content,
+      this.onPressed,
+      this.color,
+      this.icon,
+      this.showViewIcon = true});
 
   @override
   Widget build(BuildContext context) {
@@ -58,13 +64,15 @@ class InformationCard extends StatelessWidget {
                   ),
                 ),
               ),
-              Expanded(
-                flex: 0,
-                child: Icon(
-                  Icons.navigate_next,
-                  color: color,
-                ),
-              ),
+              showViewIcon
+                  ? Expanded(
+                      flex: 0,
+                      child: Icon(
+                        Icons.navigate_next,
+                        color: color,
+                      ),
+                    )
+                  : SizedBox(),
             ],
           ),
         ),

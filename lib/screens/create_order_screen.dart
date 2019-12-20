@@ -1,6 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:fresto_apps/components/food_card.dart';
 import 'package:fresto_apps/components/schedule_card.dart';
+import 'package:fresto_apps/components/title_and_subtitle_row_text.dart';
+import 'package:fresto_apps/utils/constants.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
 
 class CreateOrderScreen extends StatefulWidget {
@@ -17,23 +21,32 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
   String _picked = "Pay Half";
 
   Widget _foodList() {
-    // Todo Ordered Food List Card
-    // Todo Return list of ordered food
-    return Column(
-      children: <Widget>[
-        Container(
-          padding: EdgeInsets.all(8.0),
-          width: double.infinity,
-          child: Text(
-            'Product Details',
-            textAlign: TextAlign.start,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16.0,
+    return InkWell(
+      onTap: () => Navigator.pushNamed(context, kMerchantDetailScreenRoute),
+      child: Column(
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.all(8.0),
+            width: double.infinity,
+            child: Text(
+              'Product Details',
+              textAlign: TextAlign.start,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16.0,
+              ),
             ),
           ),
-        ),
-      ],
+          ListView.builder(
+            itemBuilder: (context, index) {
+              return FoodCardWithQuantity();
+            },
+            itemCount: 1,
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+          )
+        ],
+      ),
     );
   }
 
@@ -48,6 +61,55 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     );
   }
 
+  Widget _merchantDetailsSection() {
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+      child: Column(
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.all(8.0),
+            width: double.infinity,
+            child: Text(
+              'Merchant Details',
+              textAlign: TextAlign.start,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16.0,
+              ),
+            ),
+          ),
+          ListTile(
+            onTap: () =>
+                Navigator.pushNamed(context, kMerchantDetailScreenRoute),
+            leading: CachedNetworkImage(
+              imageUrl: kDummyMerchantImage,
+              fit: BoxFit.fill,
+            ),
+            title: Text(kDummyMerchantName),
+            subtitle: Text(
+              kDummyDescription,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            isThreeLine: true,
+          ),
+          ListTile(
+            title: Text(
+              "Address",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(kDummyMerchantAddress),
+            trailing: Icon(
+              Icons.location_on,
+              color: Colors.orange,
+            ),
+          ),
+          SizedBox(height: 8.0),
+        ],
+      ),
+    );
+  }
+
   Widget _paymentDetailsSection() {
     return Card(
       margin: EdgeInsets.symmetric(
@@ -57,23 +119,23 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
       child: Column(
         children: <Widget>[
           _foodList(),
-          DetailAndPriceText(
-            description: "Product Total",
-            price: 400000.0,
+          TitleAndSubtitleRowText(
+            title: "Product Total",
+            description: "Rp 400000.0",
             fontSize: 16.0,
           ),
-          DetailAndPriceText(
-            description: "Product Tax",
-            price: 40000.0,
+          TitleAndSubtitleRowText(
+            title: "Product Tax",
+            description: "Rp 40000.0",
             fontSize: 16.0,
           ),
           Divider(),
-          DetailAndPriceText(
-            description: "Grand Total",
-            price: 440000.0,
+          TitleAndSubtitleRowText(
+            title: "Grand Total",
+            description: "Rp 440000.0",
             fontSize: 20,
-            descriptionColor: Colors.blueGrey,
-            priceColor: Colors.blue,
+            titleColor: Colors.blueGrey,
+            descriptionColor: Colors.blue,
           ),
         ],
       ),
@@ -152,11 +214,37 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     );
   }
 
+  Widget _cancelButtonSection() {
+    return Container(
+      color: Colors.red,
+      padding: EdgeInsets.all(8.0),
+      margin: EdgeInsets.symmetric(
+        vertical: 4.0,
+        horizontal: 8.0,
+      ),
+      width: double.infinity,
+      alignment: Alignment.center,
+      child: InkWell(
+          onTap: () {
+            Fluttertoast.showToast(msg: "Order Pressed");
+            Navigator.pop(context);
+          },
+          child: Text(
+            "Cancel",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 20.0,
+            ),
+          )),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Order Detail'),
+        title: Text('Create Reservation'),
       ),
       body: Container(
         child: ListView(
@@ -165,60 +253,13 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
           children: <Widget>[
             _timeSection(),
             _paymentMethodSection(),
+            _merchantDetailsSection(),
             _paymentDetailsSection(),
             _downPaymentSection(),
             _confirmButtonSection(),
+            _cancelButtonSection(),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class DetailAndPriceText extends StatelessWidget {
-  final String description;
-  final double price;
-  final double fontSize;
-  final Color descriptionColor;
-  final Color priceColor;
-
-  DetailAndPriceText(
-      {@required this.description,
-      @required this.price,
-      @required this.fontSize,
-      this.descriptionColor,
-      this.priceColor});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Expanded(
-            flex: 1,
-            child: Text(
-              this.description,
-              style: TextStyle(
-                color: this.descriptionColor ?? Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: this.fontSize,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 0,
-            child: Text(
-              "Rp $price",
-              style: TextStyle(
-                color: this.priceColor ?? Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: this.fontSize,
-              ),
-            ),
-          )
-        ],
       ),
     );
   }

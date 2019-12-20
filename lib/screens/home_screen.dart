@@ -71,6 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Expanded(
                       flex: 1,
                       child: HeaderAppBarButton(
+                        key: Key("btnHomeSignOut"),
                         icon: Icons.exit_to_app,
                         text: "Sign-out",
                         onTap: _signOut,

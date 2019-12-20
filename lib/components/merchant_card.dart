@@ -41,40 +41,45 @@ class LoadingMerchantCard extends StatelessWidget {
 class MerchantCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          ClipRRect(
-            borderRadius: BorderRadius.circular(3.0),
-            child: CachedNetworkImage(
-              height: 180.0,
-              imageUrl: kDummyMerchantImage,
-              fit: BoxFit.cover,
+    return InkWell(
+      onTap: () {
+        Navigator.pushNamed(context, kMerchantDetailScreenRoute);
+      },
+      child: Card(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(3.0),
+              child: CachedNetworkImage(
+                height: 180.0,
+                imageUrl: kDummyMerchantImage,
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-          Container(
-            padding: EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  kDummyMerchantName,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
+            Container(
+              padding: EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    kDummyMerchantName,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                Text(
-                  kDummyMerchantAddress,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+                  Text(
+                    kDummyMerchantAddress,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

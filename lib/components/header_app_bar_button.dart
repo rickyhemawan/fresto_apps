@@ -4,8 +4,9 @@ class HeaderAppBarButton extends StatelessWidget {
   final IconData icon;
   final String text;
   final Function onTap;
+  final Key key;
 
-  HeaderAppBarButton({this.icon, this.text, this.onTap});
+  HeaderAppBarButton({this.icon, this.text, this.onTap, this.key});
 
   @override
   Widget build(BuildContext context) {

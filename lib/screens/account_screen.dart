@@ -16,8 +16,45 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 
-  void _signOut() {
-    Provider.of<CurrentUserData>(context).signOutUser(context);
+  Widget _accountSection() {
+    return SliverToBoxAdapter(
+      child: Card(
+        margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+        child: Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Text("Ricky Hemawan"),
+              Divider(
+                indent: 4.0,
+                endIndent: 4.0,
+              ),
+              Text("rickyhemawan@gmail.com"),
+              Text("+6281234567890"),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _logoutSection() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: MaterialButton(
+          key: Key("btnAccountSignOut"),
+          padding: EdgeInsets.all(8.0),
+          color: Colors.red,
+          textColor: Colors.white,
+          child: Text("Sign Out"),
+          onPressed: () {
+            Provider.of<CurrentUserData>(context).signOutUser(context);
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -25,41 +62,8 @@ class _AccountScreenState extends State<AccountScreen> {
     return CustomScrollView(
       slivers: <Widget>[
         _appBar(),
-        SliverToBoxAdapter(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Card(
-                margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      Text("Ricky Hemawan"),
-                      Divider(
-                        indent: 4.0,
-                        endIndent: 4.0,
-                      ),
-                      Text("rickyhemawan@gmail.com"),
-                      Text("+6281234567890"),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: MaterialButton(
-                  padding: EdgeInsets.all(8.0),
-                  color: Colors.red,
-                  textColor: Colors.white,
-                  child: Text("Sign Out"),
-                  onPressed: _signOut,
-                ),
-              ),
-            ],
-          ),
-        ),
+        _accountSection(),
+        _logoutSection(),
       ],
     );
   }
