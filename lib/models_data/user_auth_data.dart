@@ -5,7 +5,7 @@ import 'package:fresto_apps/apis/client_api.dart';
 import 'package:fresto_apps/models/client.dart';
 import 'package:fresto_apps/utils/constants.dart';
 
-class CurrentUserData extends ChangeNotifier {
+class UserAuthData extends ChangeNotifier {
   // Async Views Properties
   bool loadingStatus = false;
 
@@ -16,7 +16,7 @@ class CurrentUserData extends ChangeNotifier {
   String phoneNumber = "";
   String fullName = "";
 
-  CurrentUserData({auth}) {
+  UserAuthData({auth}) {
     this.auth = auth ?? FirebaseAuth.instance;
   }
 
@@ -58,6 +58,15 @@ class CurrentUserData extends ChangeNotifier {
     notifyListeners();
   }
 
+  void resetAllInputValue() {
+    this.email = "";
+    this.password = "";
+    this.confirmPassword = "";
+    this.phoneNumber = "";
+    this.fullName = "";
+    notifyListeners();
+  }
+
   void enableLoading() {
     this.loadingStatus = true;
     notifyListeners();
@@ -72,19 +81,17 @@ class CurrentUserData extends ChangeNotifier {
   // Standard validator for login or registering user
   //-------------------------------------------------
 
-  void validator({bool isLogin = true}) {
-    if (email.isEmpty) throw "Email cannot be empty";
-    bool emailValidator = RegExp(
-            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-        .hasMatch(email);
-    if (!emailValidator) throw "Not a valid email address";
-    if (password.isEmpty) throw "Password cannot be empty";
-    if (isLogin) return;
+  void validator({bool isLoginScreen = true}) {
+    if (email.isEmpty) throw kErrorEmptyEmail;
+    bool emailValidator = RegExp(kEmailRegex).hasMatch(email);
+    if (!emailValidator) throw kErrorNotValidEmailAddress;
+    if (password.isEmpty) throw kErrorEmptyPassword;
+    if (isLoginScreen) return;
 
-    if (confirmPassword.isEmpty) throw "Confirm password cannot be empty";
-    if (confirmPassword != password) throw "Password doesnt match";
-    if (phoneNumber.isEmpty) throw "Phone Number cannot be empty";
-    if (fullName.isEmpty) throw "Full Name cannot be empty";
+    if (confirmPassword.isEmpty) throw kErrorEmptyConfirmPassword;
+    if (confirmPassword != password) throw kErrorPasswordNotMatch;
+    if (phoneNumber.isEmpty) throw kErrorEmptyPhoneNumber;
+    if (fullName.isEmpty) throw kErrorEmptyFullName;
   }
 
   // check whether user is authenticated or not
@@ -111,16 +118,15 @@ class CurrentUserData extends ChangeNotifier {
   void nextPage(context) async {
     final _navigator = Navigator.of(context);
     printUserDetails();
-    // TODO: delete this dummy when done
-    if (giveAccessToMerchant()) {
-      _navigator.pushNamedAndRemoveUntil(kMerchantMainScreenRoute, _next);
+    if (giveDirectAccessToAdmin()) {
+      _navigator.pushNamedAndRemoveUntil(kAdminMainScreenRoute, _next);
       return;
     }
     if (await isUserAuthenticated()) {
-      _navigator.pushNamedAndRemoveUntil(kMainScreenRoute, _next);
+      _navigator.pushNamedAndRemoveUntil(kAdminMainScreenRoute, _next);
       return;
     }
-    _navigator.pushNamedAndRemoveUntil(kLoginScreen, _next);
+    _navigator.pushNamedAndRemoveUntil(kLoginScreenRoute, _next);
   }
 
   //----------------------------------
@@ -133,13 +139,12 @@ class CurrentUserData extends ChangeNotifier {
     _user = null;
     printUserDetails();
     if (context == null) return;
-    Navigator.of(context).pushNamedAndRemoveUntil(kLoginScreen, _next);
+    Navigator.of(context).pushNamedAndRemoveUntil(kLoginScreenRoute, _next);
   }
 
   // Login, return message string, and null for success
   Future<String> loginUser() async {
-    // TODO: delete this dummy when done
-    if (giveAccessToMerchant()) return null;
+    if (giveDirectAccessToAdmin()) return null;
 
     enableLoading();
     try {
@@ -155,13 +160,13 @@ class CurrentUserData extends ChangeNotifier {
       );
       if (createUser.user == null) {
         disableLoading();
-        return "User is not available";
+        return kErrorUserNotRegistered;
       }
       _user = createUser.user;
     } catch (e) {
       print(e);
       disableLoading();
-      return "Wrong Email or Password";
+      return kErrorWrongEmailOrPassword;
     }
     disableLoading();
     return null;
@@ -171,7 +176,7 @@ class CurrentUserData extends ChangeNotifier {
   Future<String> registerUser() async {
     enableLoading();
     try {
-      validator(isLogin: false);
+      validator(isLoginScreen: false);
     } catch (e) {
       disableLoading();
       return e;
@@ -183,9 +188,9 @@ class CurrentUserData extends ChangeNotifier {
       );
       if (createUser.user == null) {
         disableLoading();
-        return "Cannot Create this User";
+        return kErrorCreateUserFailed;
       }
-      ClientAPI.addNewUserToDatabase(Client(
+      await ClientAPI.addNewClientToDatabase(Client(
         email: this.email,
         fullName: this.fullName,
         phoneNumber: this.phoneNumber,
@@ -194,21 +199,22 @@ class CurrentUserData extends ChangeNotifier {
     } catch (e) {
       print(e);
       disableLoading();
-      return "Email is already in use";
+      return kErrorEmailAlreadyInUse;
     }
     disableLoading();
     return null;
   }
 
-  //--------------------------------------------
-  // Dummy Testing Functions (Delete This Later)
-  //--------------------------------------------
+  //------------
+  // Admin Login
+  //------------
 
-  final dummyMerchantEmail = "merchant@dummy.com";
-  final dummyMerchantPassword = "1234";
+  final String adminEmail = "admin@admin.com";
+  final String adminPassword = "admin1234";
 
-  bool giveAccessToMerchant() {
-    if (this.email != dummyMerchantEmail) return false;
-    return this.password == dummyMerchantPassword;
+  bool giveDirectAccessToAdmin() {
+    if (this.email != adminEmail.trim() &&
+        this.password != adminPassword.trim()) return false;
+    return true;
   }
 }

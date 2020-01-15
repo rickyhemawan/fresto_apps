@@ -3,7 +3,7 @@ import 'package:fresto_apps/components/food_card.dart';
 import 'package:fresto_apps/components/header_app_bar_button.dart';
 import 'package:fresto_apps/components/home_vertical_card.dart';
 import 'package:fresto_apps/components/overlapping_sliver_app_bar_delegate.dart';
-import 'package:fresto_apps/models_data/current_user_data.dart';
+import 'package:fresto_apps/models_data/user_auth_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
 import 'package:provider/provider.dart';
 
@@ -16,7 +16,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   void _signOut() {
-    Provider.of<CurrentUserData>(context).signOutUser(context);
+    Provider.of<UserAuthData>(context).signOutUser(context);
   }
 
   Widget _appBar(BuildContext context) {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fresto_apps/models_data/current_user_data.dart';
+import 'package:fresto_apps/models_data/user_auth_data.dart';
 import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -19,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
     ScreenUtil.instance = ScreenUtil.getInstance()..init(context);
     ScreenUtil.instance =
         ScreenUtil(width: 750, height: 1334, allowFontScaling: true);
-    Provider.of<CurrentUserData>(context).nextPage(context);
+    Provider.of<UserAuthData>(context).nextPage(context);
     return Scaffold(
       backgroundColor: Colors.green,
       body: Container(

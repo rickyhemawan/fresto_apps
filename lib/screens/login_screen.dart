@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fresto_apps/components/login_form_card.dart';
-import 'package:fresto_apps/models_data/current_user_data.dart';
+import 'package:fresto_apps/models_data/user_auth_data.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -24,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _buttonPressed(context) async {
     String result;
-    final provider = Provider.of<CurrentUserData>(context);
+    final provider = Provider.of<UserAuthData>(context);
     if (_login) {
       result = await provider.loginUser();
     } else {
@@ -139,7 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-            _loadingScreen(Provider.of<CurrentUserData>(context).loadingStatus),
+            _loadingScreen(Provider.of<UserAuthData>(context).loadingStatus),
           ],
         );
       }),

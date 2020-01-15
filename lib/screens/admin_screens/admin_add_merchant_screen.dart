@@ -3,16 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fresto_apps/utils/constants.dart';
 
-class MerchantProfileScreen extends StatefulWidget {
-  const MerchantProfileScreen({Key key}) : super(key: key);
+class AdminAddMerchantScreen extends StatefulWidget {
   @override
-  _MerchantProfileScreenState createState() => _MerchantProfileScreenState();
+  _AdminAddMerchantScreenState createState() => _AdminAddMerchantScreenState();
 }
 
-class _MerchantProfileScreenState extends State<MerchantProfileScreen> {
+class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
   Widget _appBar(BuildContext context) {
     return SliverAppBar(
-      title: Text("Merchant Profile"),
+      title: Text("Add New Merchant"),
       expandedHeight: 200,
       flexibleSpace: FlexibleSpaceBar(
         background: CachedNetworkImage(
@@ -172,22 +171,6 @@ class _MerchantProfileScreenState extends State<MerchantProfileScreen> {
     );
   }
 
-  Widget _logoutSection() {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: MaterialButton(
-          padding: EdgeInsets.all(8.0),
-          color: Colors.red,
-          textColor: Colors.white,
-          child: Text("Sign Out"),
-          onPressed: () => Navigator.pushNamedAndRemoveUntil(
-              context, kLoginScreenRoute, (Route<dynamic> route) => false),
-        ),
-      ),
-    );
-  }
-
   Widget _sectionTitle(String title, {EdgeInsetsGeometry margin}) {
     return SliverToBoxAdapter(
       child: Container(
@@ -195,6 +178,24 @@ class _MerchantProfileScreenState extends State<MerchantProfileScreen> {
         child: Text(
           title,
           style: Theme.of(context).textTheme.title,
+        ),
+      ),
+    );
+  }
+
+  Widget _addMerchantButtonSection() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: MaterialButton(
+          padding: EdgeInsets.all(8.0),
+          color: Colors.green,
+          textColor: Colors.white,
+          child: Text("Add Merchant"),
+          onPressed: () {
+            _dummyAddMerchantFunction();
+            Navigator.pop(context);
+          },
         ),
       ),
     );
@@ -216,10 +217,42 @@ class _MerchantProfileScreenState extends State<MerchantProfileScreen> {
             _descriptionSection(),
             _sectionTitle("Modify Options"),
             _modifyMerchantSection(),
-            _logoutSection(),
+            _addMerchantButtonSection(),
           ],
         ),
       ),
     );
+  }
+
+  // TODO: Delete this function later
+  void _dummyAddMerchantFunction() async {
+//    print("main executed");
+//    Merchant merchant = Merchant(email: "new@merchant.com", menus: [
+//      Menu(
+//          name: "MENU1",
+//          price: 1000.0,
+//          available: true,
+//          description: "This is MENU1",
+//          imageUrl: ""),
+//      Menu(
+//          name: "MENU2",
+//          price: 2000.0,
+//          available: true,
+//          description: "This is MENU2",
+//          imageUrl: ""),
+//      Menu(
+//          name: "MENU3",
+//          price: 3000.0,
+//          available: true,
+//          description: "This is MENU3",
+//          imageUrl: ""),
+//    ]);
+//    String password = "password1234";
+//    String createMerchant = await MerchantAPI.addNewMerchantToDatabase(
+//      merchant: merchant,
+//      password: password,
+//      confirmPassword: password,
+//    );
+//    print(createMerchant ?? "success adding merchant");
   }
 }

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fresto_apps/models_data/current_user_data.dart';
+import 'package:fresto_apps/models_data/user_auth_data.dart';
 import 'package:mockito/mockito.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -21,7 +21,7 @@ void main() {
   when(_auth.onAuthStateChanged).thenAnswer((_) {
     return _user;
   });
-  CurrentUserData _repo = CurrentUserData(auth: _auth);
+  UserAuthData _repo = UserAuthData(auth: _auth);
 
   group('Login, Logout, Register Use cases', () {
     when(_auth.signInWithEmailAndPassword(

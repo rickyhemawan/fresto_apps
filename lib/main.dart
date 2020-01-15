@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fresto_apps/models_data/current_user_data.dart';
+import 'package:fresto_apps/models_data/user_auth_data.dart';
+import 'package:fresto_apps/screens/admin_screens/admin_add_merchant_screen.dart';
+import 'package:fresto_apps/screens/admin_screens/admin_main_screen.dart';
+import 'package:fresto_apps/screens/admin_screens/admin_show_merchants_screen.dart';
 import 'package:fresto_apps/screens/create_order_screen.dart';
 import 'package:fresto_apps/screens/login_screen.dart';
 import 'package:fresto_apps/screens/main_screen.dart';
@@ -23,7 +26,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(builder: (context) => CurrentUserData()),
+        ChangeNotifierProvider(builder: (context) => UserAuthData()),
       ],
       child: MaterialApp(
         title: 'Fresto',
@@ -37,7 +40,7 @@ class MyApp extends StatelessWidget {
           kMainScreenRoute: (context) => MainScreen(),
           kMerchantDetailScreenRoute: (context) => MerchantDetailScreen(),
           kCreateOrderScreenRoute: (context) => CreateOrderScreen(),
-          kLoginScreen: (context) => LoginScreen(),
+          kLoginScreenRoute: (context) => LoginScreen(),
           kSplashScreenRoute: (context) => SplashScreen(),
           kOrderScreenRoute: (context) => OrderScreen(),
           // Merchant
@@ -50,6 +53,11 @@ class MyApp extends StatelessWidget {
               MerchantEditSingleMenuScreen(),
           kMerchantTrackClientScreenRoute: (context) =>
               MerchantTrackClientScreen(),
+          //Admin
+          kAdminMainScreenRoute: (context) => AdminMainScreen(),
+          kAdminAddMerchantScreenRoute: (context) => AdminAddMerchantScreen(),
+          kAdminShowMerchantsScreenRoute: (context) =>
+              AdminShowMerchantsScreen(),
         },
       ),
     );

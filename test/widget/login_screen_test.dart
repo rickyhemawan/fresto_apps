@@ -1,14 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fresto_apps/models_data/current_user_data.dart';
+import 'package:fresto_apps/models_data/user_auth_data.dart';
 import 'package:fresto_apps/screens/account_screen.dart';
 import 'package:fresto_apps/screens/home_screen.dart';
 import 'package:fresto_apps/screens/login_screen.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
-class MockCurrentUserData extends Mock implements CurrentUserData {
+class MockCurrentUserData extends Mock implements UserAuthData {
   final MockFirebaseAuth auth;
   MockCurrentUserData(this.auth);
 }
@@ -26,7 +26,7 @@ void main() {
   _currentUserData = MockCurrentUserData(_auth);
 
   Widget _makeTestable(Widget child) {
-    return ChangeNotifierProvider<CurrentUserData>.value(
+    return ChangeNotifierProvider<UserAuthData>.value(
       value: _currentUserData,
       child: MaterialApp(
         home: child,

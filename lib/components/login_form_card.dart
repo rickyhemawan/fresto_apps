@@ -1,18 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fresto_apps/models_data/current_user_data.dart';
+import 'package:fresto_apps/models_data/user_auth_data.dart';
 import 'package:provider/provider.dart';
 
-class FormCard extends StatelessWidget {
+class FormCard extends StatefulWidget {
   final bool isRegister;
   FormCard({this.isRegister = true});
+
+  @override
+  _FormCardState createState() => _FormCardState();
+}
+
+class _FormCardState extends State<FormCard> {
+  bool _hidePassword = true;
+  bool _hideConfirmPassword = true;
 
   Widget _customTextField(
       {Key tfKey,
       bool obscureText = false,
+      bool isConfirmPassword = false,
+      isPassword = false,
       String name,
       TextInputType keyboardType,
       void Function(String) onChanged}) {
+    void _changeVisibilityStatus() {
+      if (isPassword) setState(() => _hidePassword = !_hidePassword);
+      if (isConfirmPassword)
+        setState(() => _hideConfirmPassword = !_hideConfirmPassword);
+      print("visibility icon pressed!");
+    }
+
+    Widget _visibilityIconButton() {
+      return IconButton(
+        icon: Icon(obscureText ? Icons.visibility : Icons.visibility_off),
+        onPressed: _changeVisibilityStatus,
+      );
+    }
+
+    bool _isIconNeeded() {
+      if (isConfirmPassword) return true;
+      if (isPassword) return true;
+      return false;
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -30,39 +60,40 @@ class FormCard extends StatelessWidget {
           onChanged: onChanged,
           decoration: InputDecoration(
               hintText: name.toLowerCase(),
+              suffixIcon: _isIconNeeded() ? _visibilityIconButton() : null,
               hintStyle: TextStyle(color: Colors.grey, fontSize: 12.0)),
         ),
       ],
     );
   }
 
-  Widget registerProperties(context) {
-    if (!isRegister) return SizedBox();
+  Widget _registerProperties(context) {
+    if (!widget.isRegister) return SizedBox();
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         _customTextField(
             tfKey: Key("tfConfirmPassword"),
             name: "Confirm Password",
-            obscureText: true,
-            onChanged:
-                Provider.of<CurrentUserData>(context).setConfirmPassword),
+            obscureText: _hideConfirmPassword,
+            isConfirmPassword: true,
+            onChanged: Provider.of<UserAuthData>(context).setConfirmPassword),
         _customTextField(
             tfKey: Key("tfPhoneNumber"),
             name: "Phone Number",
             keyboardType: TextInputType.phone,
-            onChanged: Provider.of<CurrentUserData>(context).setPhoneNumber),
+            onChanged: Provider.of<UserAuthData>(context).setPhoneNumber),
         _customTextField(
             tfKey: Key("tfFullName"),
             name: "Full Name",
-            onChanged: Provider.of<CurrentUserData>(context).setFullName),
+            onChanged: Provider.of<UserAuthData>(context).setFullName),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final String title = isRegister ? "Register" : "Login";
+    final String title = widget.isRegister ? "Register" : "Login";
     return new Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -93,15 +124,16 @@ class FormCard extends StatelessWidget {
               tfKey: Key("tfEmail"),
               name: "Email",
               keyboardType: TextInputType.emailAddress,
-              onChanged: Provider.of<CurrentUserData>(context).setEmail,
+              onChanged: Provider.of<UserAuthData>(context).setEmail,
             ),
             _customTextField(
               tfKey: Key("tfPassword"),
               name: "Password",
-              obscureText: true,
-              onChanged: Provider.of<CurrentUserData>(context).setPassword,
+              isPassword: true,
+              obscureText: _hidePassword,
+              onChanged: Provider.of<UserAuthData>(context).setPassword,
             ),
-            registerProperties(context),
+            _registerProperties(context),
             SizedBox(height: ScreenUtil.getInstance().setHeight(50)),
           ],
         ),

@@ -11,7 +11,7 @@ const kMainScreenRoute = "/main_screen_route";
 const kOrderScreenRoute = "/order_screen_route";
 const kMerchantDetailScreenRoute = "/merchant_screen";
 const kCreateOrderScreenRoute = '/create_order_screen';
-const kLoginScreen = "/login_screen";
+const kLoginScreenRoute = "/login_screen";
 
 // Merchant Route
 const kMerchantMainScreenRoute = "/merchant_main_screen_route";
@@ -22,9 +22,36 @@ const kMerchantEditSingleMenuScreenRoute =
     "/merchant_edit_single_menu_screen_route";
 const kMerchantTrackClientScreenRoute = "/merchant_track_client_screen_route";
 
-// -----
+// Admin Route
+const kAdminMainScreenRoute = "/admin_main_screen_route";
+const kAdminAddMerchantScreenRoute = "/admin_add_merchant_screen_route";
+const kAdminShowMerchantsScreenRoute = "/admin_show_merchants_screen_route";
+
+//---------------
+// Error Messages
+//---------------
+
+// Without Internet
+const kErrorEmptyEmail = "Email cannot be empty";
+const kErrorNotValidEmailAddress = "Not a valid email address";
+const kErrorEmptyPassword = "Password cannot be empty";
+const kErrorEmptyConfirmPassword = "Confirm password cannot be empty";
+const kErrorPasswordNotMatch = "Password doesnt match";
+const kErrorEmptyPhoneNumber = "Phone Number cannot be empty";
+const kErrorEmptyFullName = "Full Name cannot be empty";
+
+// With Internet
+const kErrorUserNotRegistered = "User is not available";
+const kErrorWrongEmailOrPassword =  "Wrong Email or Password";
+const kErrorCreateUserFailed = "Cannot Create this User";
+const kErrorEmailAlreadyInUse = "Email is already in use";
+
+//regex
+const kEmailRegex = r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
+
+//------
 // Views
-// -----
+//------
 
 // Login / Register View
 const double expandedHeight = 152;
