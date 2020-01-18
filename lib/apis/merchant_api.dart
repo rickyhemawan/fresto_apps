@@ -28,13 +28,16 @@ class MerchantAPI {
         password: password,
       );
       if (merchantUser.user == null) return kErrorCreateUserFailed;
+      merchant.userUid = merchantUser.user.uid;
       await firestore
           .collection(kMerchantCollection)
-          .document()
+          .document(merchantUser.user.uid)
           .setData(merchant.toJson());
     } catch (e) {
+      auth.signOut();
       return e.toString();
     }
+    auth.signOut();
     return null;
   }
 }

@@ -73,3 +73,6 @@
 
 # Google Services (Firebase)
 google-services.json
+
+# Personal Api Key
+api-key.json

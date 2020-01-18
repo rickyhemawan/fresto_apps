@@ -1,7 +1,9 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:fresto_apps/models_data/admin_data/admin_modify_merchant_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class AdminAddMerchantScreen extends StatefulWidget {
   @override
@@ -9,15 +11,19 @@ class AdminAddMerchantScreen extends StatefulWidget {
 }
 
 class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
+  Future _modifyImage() async {
+    print("selecting img from gallery");
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    Provider.of<AdminModifyMerchantData>(context).uploadImage(file: image);
+  }
+
   Widget _appBar(BuildContext context) {
     return SliverAppBar(
-      title: Text("Add New Merchant"),
+      title: Text("Add Merchant (Preview)"),
       expandedHeight: 200,
       flexibleSpace: FlexibleSpaceBar(
-        background: CachedNetworkImage(
-          imageUrl: kDummyMerchantImage,
-          fit: BoxFit.cover,
-        ),
+        background:
+            Provider.of<AdminModifyMerchantData>(context).getMerchantImage(),
       ),
       pinned: true,
     );
@@ -138,6 +144,7 @@ class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
               leading: Icon(Icons.add_photo_alternate),
               title: Text("Modify Restaurant Image"),
               trailing: Icon(Icons.edit),
+              onTap: _modifyImage,
             ),
             ListTile(
               leading: Icon(Icons.title),
@@ -204,21 +211,26 @@ class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: <Widget>[
-            _appBar(context),
-            _sectionTitle(kDummyMerchantName),
-            _statusSection(),
-            _sectionTitle("Address"),
-            _addressSection(),
-            _sectionTitle("Description"),
-            _descriptionSection(),
-            _sectionTitle("Modify Options"),
-            _modifyMerchantSection(),
-            _addMerchantButtonSection(),
-          ],
+      backgroundColor: Colors.green,
+      body: Container(
+        child: SafeArea(
+          child: Container(
+            color: Colors.white,
+            child: CustomScrollView(
+              slivers: <Widget>[
+                _appBar(context),
+                _sectionTitle(kDummyMerchantName),
+                _statusSection(),
+                _sectionTitle("Address"),
+                _addressSection(),
+                _sectionTitle("Description"),
+                _descriptionSection(),
+                _sectionTitle("Modify Options"),
+                _modifyMerchantSection(),
+                _addMerchantButtonSection(),
+              ],
+            ),
+          ),
         ),
       ),
     );

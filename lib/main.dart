@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fresto_apps/models_data/admin_data/admin_modify_merchant_data.dart';
 import 'package:fresto_apps/models_data/user_auth_data.dart';
 import 'package:fresto_apps/screens/admin_screens/admin_add_merchant_screen.dart';
 import 'package:fresto_apps/screens/admin_screens/admin_main_screen.dart';
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(builder: (context) => UserAuthData()),
+        ChangeNotifierProvider(builder: (context) => AdminModifyMerchantData()),
       ],
       child: MaterialApp(
         title: 'Fresto',

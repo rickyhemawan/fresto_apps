@@ -123,7 +123,7 @@ class UserAuthData extends ChangeNotifier {
       return;
     }
     if (await isUserAuthenticated()) {
-      _navigator.pushNamedAndRemoveUntil(kAdminMainScreenRoute, _next);
+      _navigator.pushNamedAndRemoveUntil(kMainScreenRoute, _next);
       return;
     }
     _navigator.pushNamedAndRemoveUntil(kLoginScreenRoute, _next);
@@ -154,15 +154,15 @@ class UserAuthData extends ChangeNotifier {
       return e;
     }
     try {
-      final createUser = await auth.signInWithEmailAndPassword(
+      final signInUser = await auth.signInWithEmailAndPassword(
         email: this.email,
         password: this.password,
       );
-      if (createUser.user == null) {
+      if (signInUser.user == null) {
         disableLoading();
         return kErrorUserNotRegistered;
       }
-      _user = createUser.user;
+      _user = signInUser.user;
     } catch (e) {
       print(e);
       disableLoading();
@@ -213,8 +213,9 @@ class UserAuthData extends ChangeNotifier {
   final String adminPassword = "admin1234";
 
   bool giveDirectAccessToAdmin() {
-    if (this.email != adminEmail.trim() &&
-        this.password != adminPassword.trim()) return false;
-    return true;
+    print("Login as = $email $password");
+    if (this.email.trim() == adminEmail.trim() &&
+        this.password.trim() == adminPassword.trim()) return true;
+    return false;
   }
 }

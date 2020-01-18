@@ -7,7 +7,7 @@ class ClientAPI {
     final Firestore firestore = Firestore.instance;
     await firestore
         .collection(kClientCollection)
-        .document()
+        .document(client.userUid)
         .setData(client.toJson());
     return;
   }
