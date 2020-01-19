@@ -42,12 +42,19 @@ const kErrorEmptyFullName = "Full Name cannot be empty";
 
 // With Internet
 const kErrorUserNotRegistered = "User is not available";
-const kErrorWrongEmailOrPassword =  "Wrong Email or Password";
+const kErrorWrongEmailOrPassword = "Wrong Email or Password";
 const kErrorCreateUserFailed = "Cannot Create this User";
 const kErrorEmailAlreadyInUse = "Email is already in use";
 
-//regex
-const kEmailRegex = r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
+// Regex filter
+const kEmailRegex =
+    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
+
+// Default Content
+const kDefaultRestaurantName = "Restaurant Name Here";
+const kDefaultAddress = "Address Here";
+const kDefaultDescription = "Description Here";
+const kDefaultOperatingTime = "Operating Time Here";
 
 //------
 // Views

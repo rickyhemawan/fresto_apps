@@ -11,10 +11,49 @@ class AdminAddMerchantScreen extends StatefulWidget {
 }
 
 class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
+  // Text Fields Controllers
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+
   Future _modifyImage() async {
     print("selecting img from gallery");
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-    Provider.of<AdminModifyMerchantData>(context).uploadImage(file: image);
+    Provider.of<AdminModifyMerchantData>(context).setImageViaFile(file: image);
+  }
+
+  void _modifyTextField({
+    @required BuildContext context,
+    @required TextEditingController textController,
+    @required String hintText,
+    @required Function successCallback,
+  }) {
+    {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Change Restaurant $hintText"),
+            content: TextField(
+              controller: textController,
+              decoration: InputDecoration(hintText: "Restaurant $hintText"),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("Cancel"),
+              ),
+              FlatButton(
+                onPressed: () {
+                  successCallback(textController.text);
+                  Navigator.pop(context);
+                },
+                child: Text("Save Changes"),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   Widget _appBar(BuildContext context) {
@@ -41,7 +80,8 @@ class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
             Expanded(
               flex: 1,
               child: Text(
-                kDummyMerchantOpenStatus,
+                Provider.of<AdminModifyMerchantData>(context)
+                    .getMerchantOperatingHour(),
                 textAlign: TextAlign.justify,
               ),
             ),
@@ -122,7 +162,8 @@ class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
           horizontal: 8.0,
         ),
         child: Text(
-          kDummyDescription,
+          Provider.of<AdminModifyMerchantData>(context)
+              .getMerchantDescription(),
           textAlign: TextAlign.justify,
         ),
       ),
@@ -150,6 +191,14 @@ class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
               leading: Icon(Icons.title),
               title: Text("Modify Restaurant Name"),
               trailing: Icon(Icons.edit),
+              onTap: () => _modifyTextField(
+                context: context,
+                textController: titleController,
+                hintText: "Name",
+                successCallback: (name) =>
+                    Provider.of<AdminModifyMerchantData>(context)
+                        .setMerchantName(name: name),
+              ),
             ),
             ListTile(
               leading: Icon(Icons.wb_sunny),
@@ -163,8 +212,16 @@ class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
             ),
             ListTile(
               leading: Icon(Icons.details),
-              title: Text("Modify Restaurant Details"),
+              title: Text("Modify Restaurant Description"),
               trailing: Icon(Icons.edit),
+              onTap: () => _modifyTextField(
+                context: context,
+                textController: descriptionController,
+                hintText: "Description",
+                successCallback: (description) =>
+                    Provider.of<AdminModifyMerchantData>(context)
+                        .setMerchantDescription(description: description),
+              ),
             ),
             ListTile(
               leading: Icon(Icons.do_not_disturb_alt),
@@ -219,7 +276,8 @@ class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
             child: CustomScrollView(
               slivers: <Widget>[
                 _appBar(context),
-                _sectionTitle(kDummyMerchantName),
+                _sectionTitle(Provider.of<AdminModifyMerchantData>(context)
+                    .getMerchantTitle()),
                 _statusSection(),
                 _sectionTitle("Address"),
                 _addressSection(),

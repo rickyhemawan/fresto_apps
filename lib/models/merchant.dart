@@ -11,6 +11,7 @@ class Merchant extends User {
   bool dayOff;
   bool outOfOrder;
   List<Menu> menus;
+  String description;
 
   Merchant({
     String email,
@@ -25,6 +26,7 @@ class Merchant extends User {
     this.dayOff,
     this.outOfOrder,
     this.menus,
+    this.description,
   }) : super(
           userUid: userUid,
           email: email,
@@ -44,6 +46,7 @@ class Merchant extends User {
     this.dayOff = json["dayOff"];
     this.outOfOrder = json["dayOff"];
     this.menus = json["menus"];
+    this.description = json["description"];
   }
 
   List encodeToJson(List<Menu> list) {
@@ -65,5 +68,6 @@ class Merchant extends User {
         "dayOff": this.dayOff,
         "outOfOrder": this.outOfOrder,
         "menus": encodeToJson(this.menus),
+        "description": this.description,
       };
 }
