@@ -3,6 +3,7 @@ import 'package:fresto_apps/components/food_card.dart';
 import 'package:fresto_apps/components/header_app_bar_button.dart';
 import 'package:fresto_apps/components/home_vertical_card.dart';
 import 'package:fresto_apps/components/overlapping_sliver_app_bar_delegate.dart';
+import 'package:fresto_apps/models_data/merchants_data.dart';
 import 'package:fresto_apps/models_data/user_auth_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
 import 'package:provider/provider.dart';
@@ -91,13 +92,22 @@ class _HomeScreenState extends State<HomeScreen> {
     return SliverToBoxAdapter(
       child: Container(
         height: cardHeight,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: 5,
-          itemBuilder: (context, index) {
-            return HomeVerticalCard();
-          },
-        ),
+        child: Provider.of<MerchantsData>(context)
+                .getMenusWithMerchantMap()
+                .isNotEmpty
+            ? ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: 5,
+                itemBuilder: (context, index) {
+                  return HomeVerticalCard(
+                    menu: Provider.of<MerchantsData>(context)
+                        .getMenusWithMerchantMap()[index + 5]["Menu"],
+                    merchant: Provider.of<MerchantsData>(context)
+                        .getMenusWithMerchantMap()[index + 5]["Merchant"],
+                  );
+                },
+              )
+            : SizedBox(),
       ),
     );
   }
@@ -105,10 +115,17 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _bottomSection() {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
-        (context, int) {
-          return FoodCard();
+        (context, index) {
+          return FoodCard(
+              menu: Provider.of<MerchantsData>(context)
+                  .getMenusWithMerchantMap()[index + 5]["Menu"],
+              merchant: Provider.of<MerchantsData>(context)
+                  .getMenusWithMerchantMap()[index + 5]["Merchant"]);
         },
-        childCount: 8,
+        childCount: Provider.of<MerchantsData>(context)
+                .getMenusWithMerchantMap()
+                .length -
+            5,
       ),
     );
   }

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fresto_apps/components/round_icon_button.dart';
 import 'package:fresto_apps/components/text_and_image_progress_animation.dart';
+import 'package:fresto_apps/models/menu.dart';
+import 'package:fresto_apps/models/merchant.dart';
 import 'package:fresto_apps/utils/constants.dart';
 
 class LoadingFoodCard extends StatelessWidget {
@@ -50,6 +52,10 @@ class LoadingFoodCard extends StatelessWidget {
 }
 
 class FoodCard extends StatelessWidget {
+  final Menu menu;
+  final Merchant merchant;
+  FoodCard({this.menu, this.merchant});
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -74,7 +80,7 @@ class FoodCard extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(3.0),
                   child: CachedNetworkImage(
-                    imageUrl: kDummyFoodImage,
+                    imageUrl: menu.imageUrl ?? kDummyFoodImage,
                     height: 72.0,
                     width: 72.0,
                     fit: BoxFit.cover,
@@ -94,7 +100,7 @@ class FoodCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      kDummyFoodName,
+                      menu.name ?? kDummyFoodName,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
@@ -104,7 +110,7 @@ class FoodCard extends StatelessWidget {
                     ),
                     SizedBox(height: 4.0),
                     Text(
-                      kDummyMerchantName,
+                      merchant.merchantName ?? kDummyMerchantName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.justify,

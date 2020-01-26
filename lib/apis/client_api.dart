@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:fresto_apps/apis/collection_names.dart';
 import 'package:fresto_apps/models/client.dart';
 
@@ -10,5 +11,17 @@ class ClientAPI {
         .document(client.userUid)
         .setData(client.toJson());
     return;
+  }
+
+  static Future<Client> getCurrentClient({@required String userUid}) async {
+    Client client;
+    await Firestore.instance
+        .collection(kClientCollection)
+        .document(userUid)
+        .get()
+        .then((DocumentSnapshot ds) {
+      client = Client.fromJson(ds.data);
+    });
+    return client;
   }
 }

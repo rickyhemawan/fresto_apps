@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fresto_apps/components/text_and_image_progress_animation.dart';
+import 'package:fresto_apps/models/merchant.dart';
 import 'package:fresto_apps/utils/constants.dart';
 
 class LoadingMerchantCard extends StatelessWidget {
@@ -39,6 +40,10 @@ class LoadingMerchantCard extends StatelessWidget {
 }
 
 class MerchantCard extends StatelessWidget {
+  final Merchant merchant;
+
+  MerchantCard({this.merchant});
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -54,8 +59,8 @@ class MerchantCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(3.0),
               child: CachedNetworkImage(
                 height: 180.0,
-                imageUrl: kDummyMerchantImage,
-                fit: BoxFit.cover,
+                imageUrl: merchant.imageUrl ?? kDummyMerchantImage,
+                fit: BoxFit.fill,
               ),
             ),
             Container(
@@ -65,13 +70,13 @@ class MerchantCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    kDummyMerchantName,
+                    merchant.merchantName ?? kDummyMerchantName,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    kDummyMerchantAddress,
+                    merchant.locationName ?? kDummyMerchantAddress,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),

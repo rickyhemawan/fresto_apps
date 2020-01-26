@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fresto_apps/models_data/admin_data/admin_modify_merchant_data.dart';
+import 'package:fresto_apps/models_data/client_data/client_data.dart';
+import 'package:fresto_apps/models_data/merchants_data.dart';
 import 'package:fresto_apps/models_data/user_auth_data.dart';
 import 'package:fresto_apps/screens/admin_screens/admin_add_merchant_screen.dart';
 import 'package:fresto_apps/screens/admin_screens/admin_main_screen.dart';
@@ -19,7 +22,10 @@ import 'package:provider/provider.dart';
 
 import 'utils/constants.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  await DotEnv().load('.env');
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -29,6 +35,8 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(builder: (context) => UserAuthData()),
         ChangeNotifierProvider(builder: (context) => AdminModifyMerchantData()),
+        ChangeNotifierProvider(builder: (context) => ClientData()),
+        ChangeNotifierProvider(builder: (context) => MerchantsData()),
       ],
       child: MaterialApp(
         title: 'Fresto',

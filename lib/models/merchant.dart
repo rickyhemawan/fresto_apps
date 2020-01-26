@@ -34,6 +34,7 @@ class Merchant extends User {
         );
 
   Merchant.fromJson(Map<String, dynamic> json) {
+    print("DATA TYPE OF MENUS ${json["menus"].runtimeType}");
     this.userUid = json["uid"];
     this.email = json["email"];
     this.phoneNumber = json["phoneNumber"];
@@ -45,8 +46,24 @@ class Merchant extends User {
     this.closeHour = json["closeHour"];
     this.dayOff = json["dayOff"];
     this.outOfOrder = json["dayOff"];
-    this.menus = json["menus"];
+    this.menus = decodeFromJson(json["menus"]);
     this.description = json["description"];
+  }
+
+  void addMenu(Menu menu) {
+    if (this.menus == null) this.menus = [];
+    menus.add(menu);
+  }
+
+  List<Menu> decodeFromJson(List<dynamic> dynamics) {
+    List<Menu> tempMenus = [];
+    dynamics.forEach((e) {
+      print("decodedFromJson => ${e.toString()}");
+      Map<String, dynamic> casted =
+          Map.castFrom<dynamic, dynamic, String, dynamic>(e);
+      tempMenus.add(Menu.fromJson(casted));
+    });
+    return tempMenus;
   }
 
   List encodeToJson(List<Menu> list) {
@@ -70,4 +87,9 @@ class Merchant extends User {
         "menus": encodeToJson(this.menus),
         "description": this.description,
       };
+
+  @override
+  String toString() {
+    return 'Merchant{merchantName: $merchantName, locationCoordinate: $locationCoordinate, locationName: $locationName, imageUrl: $imageUrl, openHour: $openHour, closeHour: $closeHour, dayOff: $dayOff, outOfOrder: $outOfOrder, menus: $menus, description: $description}';
+  }
 }

@@ -1,19 +1,24 @@
+import 'package:after_layout/after_layout.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fresto_apps/components/bottom_navigation_icon.dart';
 import 'package:fresto_apps/components/fab_with_notifications.dart';
+import 'package:fresto_apps/models_data/client_data/client_data.dart';
+import 'package:fresto_apps/models_data/merchants_data.dart';
 import 'package:fresto_apps/screens/account_screen.dart';
 import 'package:fresto_apps/screens/home_screen.dart';
 import 'package:fresto_apps/screens/merchants_screen.dart';
 import 'package:fresto_apps/screens/order_timeline_screen.dart';
+import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen>
+    with AfterLayoutMixin<MainScreen> {
   int _page = 0;
 
   final PageStorageBucket _bucket = PageStorageBucket();
@@ -53,5 +58,11 @@ class _MainScreenState extends State<MainScreen> {
         floatingActionButton: FABWithNotifications(),
       ),
     );
+  }
+
+  @override
+  void afterFirstLayout(BuildContext context) {
+    Provider.of<ClientData>(context).updateCurrentClientData();
+    Provider.of<MerchantsData>(context).fetchMerchantsFromDatabase();
   }
 }

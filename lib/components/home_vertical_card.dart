@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fresto_apps/components/text_and_image_progress_animation.dart';
+import 'package:fresto_apps/models/menu.dart';
+import 'package:fresto_apps/models/merchant.dart';
 import 'package:fresto_apps/utils/constants.dart';
 
 class LoadingHomeVerticalCard extends StatelessWidget {
@@ -41,6 +43,11 @@ class LoadingHomeVerticalCard extends StatelessWidget {
 }
 
 class HomeVerticalCard extends StatelessWidget {
+  final Merchant merchant;
+  final Menu menu;
+
+  HomeVerticalCard({this.merchant, this.menu});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -63,7 +70,7 @@ class HomeVerticalCard extends StatelessWidget {
                 Expanded(
                   flex: 0,
                   child: Text(
-                    kDummyFoodName,
+                    menu.name ?? kDummyFoodName,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
@@ -74,7 +81,7 @@ class HomeVerticalCard extends StatelessWidget {
                 Expanded(
                   flex: 0,
                   child: Text(
-                    kDummyMerchantName,
+                    merchant.merchantName ?? kDummyMerchantName,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -84,7 +91,7 @@ class HomeVerticalCard extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(3.0),
                     child: CachedNetworkImage(
-                      imageUrl: kDummyFoodImage,
+                      imageUrl: menu.imageUrl ?? kDummyFoodImage,
                       fit: BoxFit.cover,
                     ),
                   ),

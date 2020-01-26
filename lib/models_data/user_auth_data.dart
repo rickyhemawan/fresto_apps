@@ -96,8 +96,8 @@ class UserAuthData extends ChangeNotifier {
 
   // check whether user is authenticated or not
   Future<bool> isUserAuthenticated() async {
-    if (auth.currentUser() == null) return false;
     _user = await auth.currentUser();
+    notifyListeners();
     if (_user == null) return false;
     return true;
   }

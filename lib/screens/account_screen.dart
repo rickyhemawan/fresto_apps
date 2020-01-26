@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fresto_apps/models_data/client_data/client_data.dart';
 import 'package:fresto_apps/models_data/user_auth_data.dart';
 import 'package:provider/provider.dart';
 
@@ -25,13 +26,13 @@ class _AccountScreenState extends State<AccountScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Text("Ricky Hemawan"),
+              Text(Provider.of<ClientData>(context).getClientName()),
               Divider(
                 indent: 4.0,
                 endIndent: 4.0,
               ),
-              Text("rickyhemawan@gmail.com"),
-              Text("+6281234567890"),
+              Text(Provider.of<ClientData>(context).getClientEmail()),
+              Text(Provider.of<ClientData>(context).getClientPhoneNumber()),
             ],
           ),
         ),

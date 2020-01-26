@@ -20,10 +20,19 @@ dependencies:
   uuid: ^2.0.4
   image_picker: ^0.6.3+1
   flutter_secure_storage: ^3.3.1+1
+  flutter_dotenv: ^2.1.0
+  google_maps_flutter: ^0.5.21+15
+  flutter_google_places: ^0.2.3
+  location: ^2.3.5
+  path_provider: ^1.5.1
+  csv: ^4.0.3
+  after_layout: ^1.0.7+2
 
   firebase_core: ^0.4.2+1
   firebase_auth: ^0.15.0+1
   cloud_firestore: ^0.12.11
+
+  http: ^0.12.0+4
 
 dev_dependencies:
   flutter_test:
@@ -38,6 +47,8 @@ flutter:
     - assets/images/image_01.png
     - assets/images/image_02.png
     - assets/images/logo.png
+    - assets/data/restaurant.csv
+    - .env
 
   fonts:
     - family: CustomIcons

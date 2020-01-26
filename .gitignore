@@ -76,3 +76,7 @@ google-services.json
 
 # Personal Api Key
 api-key.json
+.env*
+
+# Personal Data
+restaurant.csv

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fresto_apps/components/merchant_card.dart';
+import 'package:fresto_apps/models_data/merchants_data.dart';
+import 'package:provider/provider.dart';
 
 class MerchantsScreen extends StatefulWidget {
   const MerchantsScreen({Key key}) : super(key: key);
@@ -19,10 +21,12 @@ class _MerchantsScreenState extends State<MerchantsScreen> {
   Widget _contentSection() {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
-        (context, int) {
-          return MerchantCard();
+        (context, index) {
+          return MerchantCard(
+            merchant: Provider.of<MerchantsData>(context).getMerchants()[index],
+          );
         },
-        childCount: 8,
+        childCount: Provider.of<MerchantsData>(context).getMerchants().length,
       ),
     );
   }
