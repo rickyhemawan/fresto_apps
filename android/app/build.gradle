@@ -40,7 +40,7 @@ android {
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
-        manifestPlaceholders = [mapsApiKey: "$System.env.MAPS_API_KEY"]
+        manifestPlaceholders = [mapsApiKey: localProperties.getProperty("MAPS_API_KEY")]
     }
 
     buildTypes {

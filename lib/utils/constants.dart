@@ -27,6 +27,9 @@ const kAdminMainScreenRoute = "/admin_main_screen_route";
 const kAdminAddMerchantScreenRoute = "/admin_add_merchant_screen_route";
 const kAdminShowMerchantsScreenRoute = "/admin_show_merchants_screen_route";
 
+// Maps Route
+const kMapSearchScreenRoute = "/map_search_screen_route";
+
 //---------------
 // Error Messages
 //---------------

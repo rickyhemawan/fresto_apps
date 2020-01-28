@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_picker/flutter_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fresto_apps/models_data/admin_data/admin_modify_merchant_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
@@ -19,6 +21,18 @@ class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
     print("selecting img from gallery");
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
     Provider.of<AdminModifyMerchantData>(context).setImageViaFile(file: image);
+  }
+
+  void showPickerNumber(BuildContext context,
+      {void Function(int) onConfirm, Widget title}) {
+    Picker(
+      adapter: NumberPickerAdapter(
+        data: [NumberPickerColumn(begin: 0, end: 23)],
+      ),
+      onConfirm: (Picker picker, List value) => onConfirm(value[0]),
+      title: title,
+      itemExtent: 32.0,
+    ).showModal(context);
   }
 
   void _modifyTextField({
@@ -202,13 +216,33 @@ class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
             ),
             ListTile(
               leading: Icon(Icons.wb_sunny),
-              title: Text("Modify Restaurant Operating Hours"),
+              title: Text("Modify Restaurant Open Hour"),
               trailing: Icon(Icons.edit),
+              onTap: () => showPickerNumber(
+                context,
+                title: Text("Open Hour"),
+                onConfirm: (int value) =>
+                    Provider.of<AdminModifyMerchantData>(context)
+                        .setMerchantOpenHour(value),
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.timelapse),
+              title: Text("Modify Restaurant Close Hour"),
+              trailing: Icon(Icons.edit),
+              onTap: () => showPickerNumber(
+                context,
+                title: Text("Close Hour"),
+                onConfirm: (int value) =>
+                    Provider.of<AdminModifyMerchantData>(context)
+                        .setMerchantCloseHour(value),
+              ),
             ),
             ListTile(
               leading: Icon(Icons.edit_location),
               title: Text("Modify Restaurant Address"),
               trailing: Icon(Icons.edit),
+              onTap: () => Navigator.pushNamed(context, kMapSearchScreenRoute),
             ),
             ListTile(
               leading: Icon(Icons.details),

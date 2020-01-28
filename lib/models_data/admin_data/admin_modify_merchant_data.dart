@@ -57,7 +57,8 @@ class AdminModifyMerchantData extends ChangeNotifier {
     if (merchant == null) return kDefaultOperatingTime;
     if (merchant.openHour == null) return kDefaultOperatingTime;
     if (merchant.closeHour == null) return kDefaultOperatingTime;
-    return "Open from.."; // TODO change this
+    if (merchant.openHour == merchant.closeHour) return "Open 24 Hour";
+    return "Open from ${merchant.openHour}:00 until ${merchant.closeHour}:00";
   }
 
   String getMerchantDescription() {
@@ -93,6 +94,18 @@ class AdminModifyMerchantData extends ChangeNotifier {
   void setMerchantDescription({@required String description}) {
     _createMerchantInstance();
     this.merchant.description = description;
+    notifyListeners();
+  }
+
+  void setMerchantCloseHour(int closeHour) {
+    _createMerchantInstance();
+    this.merchant.closeHour = closeHour;
+    notifyListeners();
+  }
+
+  void setMerchantOpenHour(int openHour) {
+    _createMerchantInstance();
+    this.merchant.openHour = openHour;
     notifyListeners();
   }
 }

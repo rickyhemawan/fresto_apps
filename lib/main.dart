@@ -10,6 +10,7 @@ import 'package:fresto_apps/screens/admin_screens/admin_show_merchants_screen.da
 import 'package:fresto_apps/screens/create_order_screen.dart';
 import 'package:fresto_apps/screens/login_screen.dart';
 import 'package:fresto_apps/screens/main_screen.dart';
+import 'package:fresto_apps/screens/maps_screens/map_search_screen.dart';
 import 'package:fresto_apps/screens/merchant_detail_screen.dart';
 import 'package:fresto_apps/screens/merchant_screens/merchant_add_single_menu_screen.dart';
 import 'package:fresto_apps/screens/merchant_screens/merchant_edit_single_menu_screen.dart';
@@ -68,6 +69,8 @@ class MyApp extends StatelessWidget {
           kAdminAddMerchantScreenRoute: (context) => AdminAddMerchantScreen(),
           kAdminShowMerchantsScreenRoute: (context) =>
               AdminShowMerchantsScreen(),
+          //Maps
+          kMapSearchScreenRoute: (context) => MapSearchScreen(),
         },
       ),
     );
