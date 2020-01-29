@@ -12,7 +12,7 @@ class GoogleMapAPI {
     return DotEnv().env["MAPS_API_KEY"];
   }
 
-  static Future<String> getAddress({@required coordinate}) async {
+  static Future<String> getAddress({@required String coordinate}) async {
     String url = _searchByCoordinate + coordinate + "&key=${getApiKey()}";
     print(url);
     var response = await http.get(url);

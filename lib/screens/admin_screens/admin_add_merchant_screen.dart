@@ -138,7 +138,8 @@ class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
             Expanded(
               flex: 1,
               child: Text(
-                kDummyMerchantAddress,
+                Provider.of<AdminModifyMerchantData>(context)
+                    .getMerchantAddress(),
                 textAlign: TextAlign.justify,
               ),
             ),

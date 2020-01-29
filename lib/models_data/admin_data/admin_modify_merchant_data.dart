@@ -33,6 +33,11 @@ class AdminModifyMerchantData extends ChangeNotifier {
     notifyListeners();
   }
 
+  void onAddressChanged(String addressName, String coordinate) {
+    setMerchantAddressCoordinate(coordinate);
+    setMerchantAddressName(addressName);
+  }
+
   //--------
   // Getters
   //--------
@@ -65,6 +70,15 @@ class AdminModifyMerchantData extends ChangeNotifier {
     if (merchant == null) return kDefaultDescription;
     if (merchant.description == null) return kDefaultDescription;
     return merchant.description;
+  }
+
+  String getMerchantAddress() {
+    if (merchant == null) return kDefaultAddress;
+    if (merchant.locationName == null) return kDefaultAddress;
+    if (merchant.locationName == "") return kDefaultAddress;
+    if (merchant.locationCoordinate == null) return kDefaultAddress;
+    if (merchant.locationCoordinate == null) return kDefaultAddress;
+    return merchant.locationName;
   }
 
   //--------
@@ -106,6 +120,18 @@ class AdminModifyMerchantData extends ChangeNotifier {
   void setMerchantOpenHour(int openHour) {
     _createMerchantInstance();
     this.merchant.openHour = openHour;
+    notifyListeners();
+  }
+
+  void setMerchantAddressName(String address) {
+    _createMerchantInstance();
+    this.merchant.locationName = address;
+    notifyListeners();
+  }
+
+  void setMerchantAddressCoordinate(String coordinate) {
+    _createMerchantInstance();
+    this.merchant.locationCoordinate = coordinate;
     notifyListeners();
   }
 }
