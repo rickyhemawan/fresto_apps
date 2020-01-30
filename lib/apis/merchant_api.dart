@@ -1,11 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:fresto_apps/apis/collection_names.dart';
 import 'package:fresto_apps/models/merchant.dart';
 import 'package:fresto_apps/utils/constants.dart';
 
 class MerchantAPI {
+
+  static const ERROR_WEAK_PASSWORD = "ERROR_WEAK_PASSWORD";
+  static const ERROR_INVALID_EMAIL = "ERROR_INVALID_EMAIL";
+  static const ERROR_EMAIL_ALREADY_IN_USE = "ERROR_EMAIL_ALREADY_IN_USE";
+
   static Future<String> addNewMerchantToDatabase(
       {@required Merchant merchant,
       @required String password,
@@ -38,9 +44,14 @@ class MerchantAPI {
         auth.signOut();
         return null;
       }
-    }, onError: (err) {
+    }, onError: (signUpError) {
       auth.signOut();
-      return err.toString();
+      if(signUpError is PlatformException){
+        if(signUpError.code == ERROR_WEAK_PASSWORD) return "The password is too weak";
+        if(signUpError.code == ERROR_INVALID_EMAIL) return "The email is invalid";
+        if(signUpError.code == ERROR_EMAIL_ALREADY_IN_USE) return "This email has already been used";
+      }
+      return signUpError.toString();
     });
     return null;
   }

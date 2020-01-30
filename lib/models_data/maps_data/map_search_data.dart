@@ -40,10 +40,18 @@ class MapSearchData extends ChangeNotifier {
   // Screens Callbacks
   //-------------------
 
-  void onMapCreated(GoogleMapController controller) =>
-      _controller.complete(controller);
+  void onMapCreated(GoogleMapController controller) {
+    if (_controller.isCompleted) {
+      _controller = Completer();
+    }
+    _controller.complete(controller);
+  }
 
   void updatePosition(CameraPosition position) {
+    if (this.address != "") {
+      this.address = "";
+      notifyListeners();
+    }
     setCameraPosition(position.target);
     setMarker(_marker.copyWith(positionParam: _cameraPosition));
   }
@@ -69,7 +77,7 @@ class MapSearchData extends ChangeNotifier {
           Function(String addressName, String addressCoordinate)
               onAddressChanged}) async {
     setLoadingStatus(true);
-    String coordinate = _positionToString(_marker.position);
+    String coordinate = _positionToString(_markers.first.position);
     if (address == "")
       address = await GoogleMapAPI.getAddress(coordinate: coordinate);
     onAddressChanged(this.address, coordinate);
@@ -90,13 +98,15 @@ class MapSearchData extends ChangeNotifier {
       setMarker(_marker.copyWith(positionParam: _locationToPosition(location)));
       await updateCameraAccordingToPosition();
       print("p.description = ${p.description}");
-      address = p.description;
+      this.address = p.description;
+      notifyListeners();
     }
   }
 
   Future<void> updateCameraAccordingToPosition() async {
     final GoogleMapController mapController = await _controller.future;
-    mapController.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+    await mapController
+        .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
       target: _cameraPosition,
       zoom: 15.0,
     )));

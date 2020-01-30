@@ -43,11 +43,17 @@ const kErrorPasswordNotMatch = "Password doesnt match";
 const kErrorEmptyPhoneNumber = "Phone Number cannot be empty";
 const kErrorEmptyFullName = "Full Name cannot be empty";
 
+const kNullMerchantName = "Merchant Name cannot be empty";
+const kNullMerchantAddress = "Merchant Address cannot be empty";
+const kNullOperationHour = "Merchant Operating hour cannot be empty";
+const kNullPhoneNumber = "Merchant Phone Number cannot be empty";
+
 // With Internet
 const kErrorUserNotRegistered = "User is not available";
 const kErrorWrongEmailOrPassword = "Wrong Email or Password";
 const kErrorCreateUserFailed = "Cannot Create this User";
 const kErrorEmailAlreadyInUse = "Email is already in use";
+const kErrorFailedUploadImage = "Error uploading image";
 
 // Regex filter
 const kEmailRegex =
@@ -58,6 +64,8 @@ const kDefaultRestaurantName = "Restaurant Name Here";
 const kDefaultAddress = "Address Here";
 const kDefaultDescription = "Description Here";
 const kDefaultOperatingTime = "Operating Time Here";
+const kDefaultPhoneNumber = "Phone Number Here";
+const kDefaultEmail = "Email Here";
 
 //------
 // Views
