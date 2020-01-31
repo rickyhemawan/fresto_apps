@@ -41,13 +41,18 @@ class LoadingMerchantCard extends StatelessWidget {
 
 class MerchantCard extends StatelessWidget {
   final Merchant merchant;
+  final Function onTap;
 
-  MerchantCard({this.merchant});
+  MerchantCard({this.merchant, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
+        if (onTap != null) {
+          onTap();
+          return;
+        }
         Navigator.pushNamed(context, kMerchantDetailScreenRoute);
       },
       child: Card(

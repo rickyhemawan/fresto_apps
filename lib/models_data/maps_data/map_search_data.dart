@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:fresto_apps/apis/google_map_api.dart';
+import 'package:fresto_apps/utils/constants.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
 
@@ -18,6 +19,7 @@ class MapSearchData extends ChangeNotifier {
   GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: GoogleMapAPI.getApiKey());
   String address = "";
   bool isFetching = false;
+  UserType userType = UserType.admin;
 
   MapSearchData() {
     _controller = Completer();
@@ -125,6 +127,18 @@ class MapSearchData extends ChangeNotifier {
   void setLoadingStatus(bool b) {
     this.isFetching = b;
     notifyListeners();
+  }
+
+  void setUserType(UserType userType) {
+    this.userType = userType;
+    notifyListeners();
+  }
+
+  void changeGoogleMapCamera({CameraPosition cameraPosition}) async {
+    if (cameraPosition != null) {
+      print("changeGoogleMapCamera called!");
+      updatePosition(cameraPosition);
+    }
   }
 
   //---------

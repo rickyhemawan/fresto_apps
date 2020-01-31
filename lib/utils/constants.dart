@@ -26,6 +26,7 @@ const kMerchantTrackClientScreenRoute = "/merchant_track_client_screen_route";
 const kAdminMainScreenRoute = "/admin_main_screen_route";
 const kAdminAddMerchantScreenRoute = "/admin_add_merchant_screen_route";
 const kAdminShowMerchantsScreenRoute = "/admin_show_merchants_screen_route";
+const kAdminModifyMerchantScreenRoute = "/admin_modify_merchant_screen_route";
 
 // Maps Route
 const kMapSearchScreenRoute = "/map_search_screen_route";
@@ -87,6 +88,12 @@ enum OrderDay {
   today,
   upcoming,
   past,
+}
+
+enum UserType {
+  admin,
+  merchant,
+  client,
 }
 
 // Dummy

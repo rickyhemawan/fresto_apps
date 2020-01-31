@@ -123,6 +123,10 @@ class UserAuthData extends ChangeNotifier {
       return;
     }
     if (await isUserAuthenticated()) {
+      if (_user.email.contains("@fresto.com")) {
+        _navigator.pushNamedAndRemoveUntil(kMerchantMainScreenRoute, _next);
+        return;
+      }
       _navigator.pushNamedAndRemoveUntil(kMainScreenRoute, _next);
       return;
     }

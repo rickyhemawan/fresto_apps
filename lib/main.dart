@@ -3,10 +3,12 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fresto_apps/models_data/admin_data/admin_modify_merchant_data.dart';
 import 'package:fresto_apps/models_data/client_data/client_data.dart';
 import 'package:fresto_apps/models_data/maps_data/map_search_data.dart';
+import 'package:fresto_apps/models_data/merchant_data/merchant_data.dart';
 import 'package:fresto_apps/models_data/merchants_data.dart';
 import 'package:fresto_apps/models_data/user_auth_data.dart';
 import 'package:fresto_apps/screens/admin_screens/admin_add_merchant_screen.dart';
 import 'package:fresto_apps/screens/admin_screens/admin_main_screen.dart';
+import 'package:fresto_apps/screens/admin_screens/admin_modify_merchant_screen.dart';
 import 'package:fresto_apps/screens/admin_screens/admin_show_merchants_screen.dart';
 import 'package:fresto_apps/screens/create_order_screen.dart';
 import 'package:fresto_apps/screens/login_screen.dart';
@@ -40,6 +42,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(builder: (context) => ClientData()),
         ChangeNotifierProvider(builder: (context) => MerchantsData()),
         ChangeNotifierProvider(builder: (context) => MapSearchData()),
+        ChangeNotifierProvider(builder: (context) => MerchantData()),
       ],
       child: MaterialApp(
         title: 'Fresto',
@@ -71,6 +74,8 @@ class MyApp extends StatelessWidget {
           kAdminAddMerchantScreenRoute: (context) => AdminAddMerchantScreen(),
           kAdminShowMerchantsScreenRoute: (context) =>
               AdminShowMerchantsScreen(),
+          kAdminModifyMerchantScreenRoute: (context) =>
+              AdminModifyMerchantScreen(),
           //Maps
           kMapSearchScreenRoute: (context) => MapSearchScreen(),
         },

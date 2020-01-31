@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fresto_apps/models_data/admin_data/admin_modify_merchant_data.dart';
 import 'package:fresto_apps/models_data/maps_data/map_search_data.dart';
+import 'package:fresto_apps/models_data/merchant_data/merchant_data.dart';
+import 'package:fresto_apps/utils/constants.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -10,6 +12,16 @@ class MapSearchScreen extends StatefulWidget {
 }
 
 class _MapSearchScreenState extends State<MapSearchScreen> {
+  dynamic Function(String, String) addressChangeCallback(UserType userType) {
+    if (userType == UserType.admin) {
+      return Provider.of<AdminModifyMerchantData>(context).onAddressChanged;
+    }
+    if (userType == UserType.merchant) {
+      return Provider.of<MerchantData>(context).onAddressChanged;
+    }
+    return null;
+  }
+
   AppBar _appBarSection(BuildContext context, MapSearchData mapSearchData) {
     return AppBar(
       title: Text("Select Address"),
@@ -34,7 +46,8 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
     );
   }
 
-  Widget _buttonSection(BuildContext context, MapSearchData mapSearchData) {
+  Widget _buttonSection(
+      BuildContext context, MapSearchData mapSearchData, UserType userType) {
     return Padding(
       padding: EdgeInsets.all(16.0),
       child: Align(
@@ -45,8 +58,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
           textColor: Colors.white,
           onPressed: () => mapSearchData.onConfirmAddress(
             context: context,
-            onAddressChanged:
-                Provider.of<AdminModifyMerchantData>(context).onAddressChanged,
+            onAddressChanged: addressChangeCallback(userType),
           ),
           child: Text("Confirm Address"),
           shape: RoundedRectangleBorder(
@@ -82,7 +94,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
           body: Stack(
             children: <Widget>[
               _mapSection(context, mapSearchData),
-              _buttonSection(context, mapSearchData),
+              _buttonSection(context, mapSearchData, mapSearchData.userType),
               _loadingScreen(context, mapSearchData),
             ],
           ),

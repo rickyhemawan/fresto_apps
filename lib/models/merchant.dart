@@ -46,7 +46,7 @@ class Merchant extends User {
     this.closeHour = json["closeHour"];
     this.dayOff = json["dayOff"];
     this.outOfOrder = json["dayOff"];
-    this.menus = decodeFromJson(json["menus"]);
+    this.menus = decodeMenusFromJson(json["menus"]);
     this.description = json["description"];
   }
 
@@ -55,8 +55,9 @@ class Merchant extends User {
     menus.add(menu);
   }
 
-  List<Menu> decodeFromJson(List<dynamic> dynamics) {
+  List<Menu> decodeMenusFromJson(List<dynamic> dynamics) {
     List<Menu> tempMenus = [];
+    if (dynamics == null) return tempMenus;
     dynamics.forEach((e) {
       print("decodedFromJson => ${e.toString()}");
       Map<String, dynamic> casted =
@@ -92,4 +93,32 @@ class Merchant extends User {
   String toString() {
     return 'Merchant{merchantName: $merchantName, locationCoordinate: $locationCoordinate, locationName: $locationName, imageUrl: $imageUrl, openHour: $openHour, closeHour: $closeHour, dayOff: $dayOff, outOfOrder: $outOfOrder, menus: $menus, description: $description}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Merchant &&
+          runtimeType == other.runtimeType &&
+          merchantName == other.merchantName &&
+          locationCoordinate == other.locationCoordinate &&
+          locationName == other.locationName &&
+          imageUrl == other.imageUrl &&
+          openHour == other.openHour &&
+          closeHour == other.closeHour &&
+          dayOff == other.dayOff &&
+          outOfOrder == other.outOfOrder &&
+          description == other.description;
+
+  @override
+  int get hashCode =>
+      merchantName.hashCode ^
+      locationCoordinate.hashCode ^
+      locationName.hashCode ^
+      imageUrl.hashCode ^
+      openHour.hashCode ^
+      closeHour.hashCode ^
+      dayOff.hashCode ^
+      outOfOrder.hashCode ^
+      menus.hashCode ^
+      description.hashCode;
 }

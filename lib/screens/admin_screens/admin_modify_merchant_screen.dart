@@ -7,16 +7,15 @@ import 'package:fresto_apps/models_data/maps_data/map_search_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
 import 'package:provider/provider.dart';
 
-class AdminAddMerchantScreen extends StatefulWidget {
+class AdminModifyMerchantScreen extends StatefulWidget {
   @override
-  _AdminAddMerchantScreenState createState() => _AdminAddMerchantScreenState();
+  _AdminModifyMerchantScreen createState() => _AdminModifyMerchantScreen();
 }
 
-class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
+class _AdminModifyMerchantScreen extends State<AdminModifyMerchantScreen> {
   // Text Fields Controllers
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
 
   //--------------
@@ -100,11 +99,11 @@ class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
   //-----------------
 
   /* This is the main content of this page,
-  it is ordered from top to bottom */
+  it is ordered from bottom to top */
 
   Widget _appBar(AdminModifyMerchantData merchantData) {
     return SliverAppBar(
-      title: Text("Add Merchant (Preview)"),
+      title: Text("Modify Merchant (Preview)"),
       expandedHeight: 200,
       flexibleSpace:
           FlexibleSpaceBar(background: merchantData.getMerchantImage()),
@@ -248,6 +247,8 @@ class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
             onTap: () {
               Navigator.pushNamed(context, kMapSearchScreenRoute);
               Provider.of<MapSearchData>(context).setUserType(UserType.admin);
+              Provider.of<MapSearchData>(context).changeGoogleMapCamera(
+                  cameraPosition: merchantData.getCameraPosition());
             },
           ),
           ListTile(
@@ -275,58 +276,7 @@ class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
     );
   }
 
-  Widget _modifyCredentials(AdminModifyMerchantData merchantData) {
-    Widget _visibilityIconButton() {
-      return IconButton(
-        icon: Icon(merchantData.isPasswordHidden
-            ? Icons.visibility
-            : Icons.visibility_off),
-        onPressed: merchantData.changePasswordVisibility,
-      );
-    }
-
-    return _sectionAlignment(
-      child: ListView(
-        physics: NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        children: <Widget>[
-          ListTile(
-            leading: Icon(Icons.email),
-            title: Text(merchantData.getMerchantEmail()),
-            trailing: Icon(Icons.edit),
-            onTap: () => _modifyTextField(
-              hintText: "Email",
-              context: context,
-              textController: emailController,
-              onConfirm: merchantData.setMerchantEmail,
-            ),
-          ),
-          ListTile(
-            leading: Icon(Icons.phone),
-            title: Text(merchantData.getMerchantPhoneNumber()),
-            trailing: Icon(Icons.edit),
-            onTap: () => _modifyTextField(
-              hintText: "Phone Number",
-              context: context,
-              textController: phoneNumberController,
-              keyboardType: TextInputType.phone,
-              onConfirm: merchantData.setMerchantPhoneNumber,
-            ),
-          ),
-          TextField(
-            obscureText: merchantData.isPasswordHidden,
-            onChanged: merchantData.setMerchantPassword,
-            decoration: InputDecoration(
-                hintText: "New Merchant Password",
-                suffixIcon: _visibilityIconButton(),
-                hintStyle: TextStyle(color: Colors.grey, fontSize: 12.0)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _addMerchantButtonSection(
+  Widget _confirmButtonSection(
       BuildContext context, AdminModifyMerchantData merchantData) {
     if (merchantData.isLoading) {
       return _sectionAlignment(
@@ -339,9 +289,9 @@ class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
           padding: EdgeInsets.all(8.0),
           color: Colors.green,
           textColor: Colors.white,
-          child: Text("Add Merchant"),
+          child: Text("Update Merchant"),
           onPressed: () async {
-            String msg = await merchantData.createMerchant();
+            String msg = await merchantData.updateMerchant();
             Fluttertoast.showToast(msg: msg);
             Navigator.pop(context);
           },
@@ -378,9 +328,7 @@ class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
                       _descriptionSection(merchantData),
                       _sectionTitle("Modify Options"),
                       _modifyMerchantSection(merchantData),
-                      _sectionTitle("User Info"),
-                      _modifyCredentials(merchantData),
-                      _addMerchantButtonSection(context, merchantData),
+                      _confirmButtonSection(context, merchantData),
                     ],
                   ),
                 ),

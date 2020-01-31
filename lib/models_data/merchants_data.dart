@@ -6,6 +6,7 @@ import 'package:fresto_apps/models/merchant.dart';
 class MerchantsData extends ChangeNotifier {
   List<Merchant> merchants;
   Firestore firestore;
+  bool isLoading = false;
 
   MerchantsData() {
     merchants = [];
@@ -38,8 +39,10 @@ class MerchantsData extends ChangeNotifier {
 
   void fetchMerchantsFromDatabase() async {
     merchants = [];
+    isLoading = true;
     notifyListeners();
     merchants = await MerchantAPI.getMerchantsFromDatabase();
+    isLoading = false;
     notifyListeners();
     merchants.forEach((f) => print(f.merchantName));
   }

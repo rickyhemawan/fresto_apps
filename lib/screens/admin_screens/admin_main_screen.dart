@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fresto_apps/models_data/merchants_data.dart';
 import 'package:fresto_apps/models_data/user_auth_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
 import 'package:provider/provider.dart';
@@ -33,12 +34,15 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
                       context, kAdminAddMerchantScreenRoute),
                 ),
                 ListTile(
-                  leading: Icon(Icons.list),
-                  title: Text("Show all merchants"),
-                  trailing: Icon(Icons.navigate_next),
-                  onTap: () => Navigator.pushNamed(
-                      context, kAdminShowMerchantsScreenRoute),
-                ),
+                    leading: Icon(Icons.list),
+                    title: Text("Show all merchants"),
+                    trailing: Icon(Icons.navigate_next),
+                    onTap: () {
+                      Provider.of<MerchantsData>(context)
+                          .fetchMerchantsFromDatabase();
+                      Navigator.pushNamed(
+                          context, kAdminShowMerchantsScreenRoute);
+                    }),
                 ListTile(
                   leading: Icon(Icons.exit_to_app),
                   title: Text("Log Out"),
