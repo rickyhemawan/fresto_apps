@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:fresto_apps/apis/collection_names.dart';
+import 'package:fresto_apps/models/menu.dart';
 import 'package:fresto_apps/models/merchant.dart';
 import 'package:fresto_apps/utils/constants.dart';
 
@@ -112,5 +113,25 @@ class MerchantAPI {
         .get()
         .then((DocumentSnapshot ds) => merchant = Merchant.fromJson(ds.data));
     return merchant;
+  }
+
+  static Future<String> addMenusToMerchant(
+      {@required Merchant merchant, @required List<Menu> menus}) async {
+    if (merchant == null) return kNullMerchantName;
+    if (merchant.userUid == null) return kNullMerchantName;
+    if (menus == null) return kNullMenus;
+    if (menus == []) return kNullMenus;
+    try {
+      await Firestore.instance
+          .collection(kMerchantCollection)
+          .document(merchant.userUid)
+          .updateData({
+        "menus": merchant.encodeMenusToJson(menus),
+      });
+    } catch (e) {
+      print(e.toString());
+      return kErrorFailedToUpdateMenus;
+    }
+    return null;
   }
 }

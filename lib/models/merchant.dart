@@ -67,7 +67,7 @@ class Merchant extends User {
     return tempMenus;
   }
 
-  List encodeToJson(List<Menu> list) {
+  List encodeMenusToJson(List<Menu> list) {
     List jsonList = List();
     list.map((item) => jsonList.add(item.toJson())).toList();
     return jsonList;
@@ -85,7 +85,7 @@ class Merchant extends User {
         "closeHour": this.closeHour,
         "dayOff": this.dayOff,
         "outOfOrder": this.outOfOrder,
-        "menus": encodeToJson(this.menus),
+        "menus": encodeMenusToJson(this.menus),
         "description": this.description,
       };
 

@@ -3,6 +3,7 @@ import 'package:flutter_picker/Picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fresto_apps/models_data/maps_data/map_search_data.dart';
 import 'package:fresto_apps/models_data/merchant_data/merchant_data.dart';
+import 'package:fresto_apps/models_data/user_auth_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
 import 'package:provider/provider.dart';
 
@@ -268,24 +269,23 @@ class _MerchantProfileScreenState extends State<MerchantProfileScreen> {
     );
   }
 
-  Widget _addMerchantButtonSection(
+  Widget _updateMerchantButton(
       BuildContext context, MerchantData merchantData) {
     if (merchantData.isLoading) {
-      return _sectionAlignment(
-          child: Center(child: CircularProgressIndicator()));
+      return SliverToBoxAdapter(child: SizedBox());
     }
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: MaterialButton(
-          padding: EdgeInsets.all(8.0),
-          color: Colors.green,
-          textColor: Colors.white,
-          child: Text("Add Merchant"),
-          onPressed: () async {
-            //TODO
-          },
-        ),
+    return _sectionAlignment(
+      child: MaterialButton(
+        padding: EdgeInsets.all(8.0),
+        color: merchantData.isMerchantValueSame() ? Colors.grey : Colors.green,
+        textColor: Colors.white,
+        child: Text("Save Changes"),
+        onPressed: () async {
+          print(
+              "x => ${merchantData.baseFetchedValue.merchantName}, y => ${merchantData.merchant.merchantName}");
+          String msg = await merchantData.updateCurrentMerchant();
+          Fluttertoast.showToast(msg: msg ?? "Success");
+        },
       ),
     );
   }
@@ -297,14 +297,14 @@ class _MerchantProfileScreenState extends State<MerchantProfileScreen> {
     }
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: MaterialButton(
           padding: EdgeInsets.all(8.0),
           color: Colors.red,
           textColor: Colors.white,
           child: Text("Sign Out"),
-          onPressed: () => Navigator.pushNamedAndRemoveUntil(
-              context, kLoginScreenRoute, (Route<dynamic> route) => false),
+          onPressed: () =>
+              Provider.of<UserAuthData>(context).signOutUser(context),
         ),
       ),
     );
@@ -340,6 +340,7 @@ class _MerchantProfileScreenState extends State<MerchantProfileScreen> {
                 _descriptionSection(merchantData),
                 _sectionTitle("Modify Options"),
                 _modifyMerchantSection(merchantData),
+                _updateMerchantButton(context, merchantData),
                 _logoutSection(merchantData),
               ],
             ),

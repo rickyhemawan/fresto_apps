@@ -138,7 +138,7 @@ class UserAuthData extends ChangeNotifier {
   //----------------------------------
 
   // Logout and redirect to Login Page
-  void signOutUser(context) {
+  void signOutUser(BuildContext context) {
     auth.signOut();
     _user = null;
     printUserDetails();

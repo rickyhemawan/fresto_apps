@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:fresto_apps/models/menu.dart';
 import 'package:fresto_apps/models/merchant.dart';
 import 'package:fresto_apps/utils/constants.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -132,6 +133,12 @@ abstract class MerchantBaseData extends ChangeNotifier {
     return merchant.dayOff;
   }
 
+  List<Menu> getMenus() {
+    if (merchant == null) return [];
+    if (merchant.menus == null) return [];
+    return this.merchant.menus;
+  }
+
   //--------
   // Setters
   //--------
@@ -200,6 +207,13 @@ abstract class MerchantBaseData extends ChangeNotifier {
   void setMerchantEmail(String email) {
     _createMerchantInstance();
     this.merchant.email = email;
+    notifyListeners();
+  }
+
+  void addMenu(Menu menu) {
+    _createMerchantInstance();
+    if (this.merchant.menus == null) this.merchant.menus = [];
+    this.merchant.menus.add(menu);
     notifyListeners();
   }
 

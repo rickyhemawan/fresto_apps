@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fresto_apps/components/food_card.dart';
+import 'package:fresto_apps/models_data/merchant_data/merchant_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
+import 'package:provider/provider.dart';
 
 class MerchantMenuListScreen extends StatefulWidget {
   const MerchantMenuListScreen({Key key}) : super(key: key);
@@ -10,13 +12,12 @@ class MerchantMenuListScreen extends StatefulWidget {
 }
 
 class _MerchantMenuListScreenState extends State<MerchantMenuListScreen> {
-  Widget _menuSection() {
+  Widget _menuSection(MerchantData merchantData) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
-        (context, int) {
-          return FoodCardWithEdit();
-        },
-        childCount: 8,
+        (context, index) =>
+            FoodCardWithEdit(menu: merchantData.getMenus()[index]),
+        childCount: merchantData.getMenus().length,
       ),
     );
   }
@@ -30,21 +31,25 @@ class _MerchantMenuListScreenState extends State<MerchantMenuListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: <Widget>[
-            _appBar(context),
-            _menuSection(),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () =>
-            Navigator.pushNamed(context, kMerchantAddSingleMenuScreenRoute),
-        child: Icon(Icons.add),
-      ),
+    return Consumer<MerchantData>(
+      builder: (context, merchantData, child) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: SafeArea(
+            child: CustomScrollView(
+              slivers: <Widget>[
+                _appBar(context),
+                _menuSection(merchantData),
+              ],
+            ),
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () =>
+                Navigator.pushNamed(context, kMerchantAddSingleMenuScreenRoute),
+            child: Icon(Icons.add),
+          ),
+        );
+      },
     );
   }
 }

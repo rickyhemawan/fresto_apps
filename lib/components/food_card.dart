@@ -355,6 +355,9 @@ class FoodCardBig extends StatelessWidget {
 }
 
 class FoodCardWithEdit extends StatelessWidget {
+  final Menu menu;
+  FoodCardWithEdit({this.menu});
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -367,7 +370,7 @@ class FoodCardWithEdit extends StatelessWidget {
               borderRadius: BorderRadius.circular(3.0),
               child: CachedNetworkImage(
                 height: 180.0,
-                imageUrl: kDummyFoodImage,
+                imageUrl: menu.imageUrl ?? kDummyDefaultImage,
                 fit: BoxFit.cover,
               ),
             ),
@@ -377,7 +380,7 @@ class FoodCardWithEdit extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    kDummyFoodName,
+                    menu.name ?? "No Name",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
@@ -385,7 +388,7 @@ class FoodCardWithEdit extends StatelessWidget {
                   ),
                   SizedBox(height: 8.0),
                   Text(
-                    kDummyFoodPrice,
+                    menu.price.toString() ?? "No Price",
                     style: TextStyle(
                       color: Colors.green,
                       fontWeight: FontWeight.bold,
@@ -393,15 +396,18 @@ class FoodCardWithEdit extends StatelessWidget {
                   ),
                   SizedBox(height: 8.0),
                   Text(
-                    kDummyDescription,
+                    menu.description ?? "No Description",
                     textAlign: TextAlign.justify,
                   ),
                   Container(
                     width: double.infinity,
                     alignment: Alignment.centerRight,
                     child: MaterialButton(
-                      onPressed: () => Navigator.pushNamed(
-                          context, kMerchantEditSingleMenuScreenRoute),
+                      onPressed: () {
+                        Navigator.pushNamed(
+                            context, kMerchantEditSingleMenuScreenRoute);
+                        //TODO change single menu data
+                      },
                       child: Text("Edit"),
                       color: Colors.green,
                       textColor: Colors.white,
