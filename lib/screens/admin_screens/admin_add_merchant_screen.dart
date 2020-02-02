@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:fresto_apps/components/modify_text_field.dart';
 import 'package:fresto_apps/models_data/admin_data/admin_modify_merchant_data.dart';
 import 'package:fresto_apps/models_data/maps_data/map_search_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
@@ -34,44 +35,6 @@ class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
       title: title,
       itemExtent: 32.0,
     ).showModal(context);
-  }
-
-  // This function show dialog to edit text's
-  void _modifyTextField({
-    @required BuildContext context,
-    @required TextEditingController textController,
-    @required String hintText,
-    @required Function(String result) onConfirm,
-    TextInputType keyboardType,
-  }) {
-    {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text("Change Restaurant $hintText"),
-            content: TextField(
-              controller: textController,
-              keyboardType: keyboardType,
-              decoration: InputDecoration(hintText: "Restaurant $hintText"),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text("Cancel"),
-              ),
-              FlatButton(
-                onPressed: () {
-                  onConfirm(textController.text);
-                  Navigator.pop(context);
-                },
-                child: Text("Save Changes"),
-              ),
-            ],
-          );
-        },
-      );
-    }
   }
 
   // This is the base alignment for each Sections
@@ -214,12 +177,18 @@ class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
             leading: Icon(Icons.title),
             title: Text("Modify Restaurant Name"),
             trailing: Icon(Icons.edit),
-            onTap: () => _modifyTextField(
-              context: context,
-              textController: titleController,
-              hintText: "Name",
-              onConfirm: merchantData.setMerchantName,
-            ),
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return ModifyTextField(
+                      context: context,
+                      textController: titleController,
+                      hintText: "Name",
+                      onConfirm: merchantData.setMerchantName,
+                    );
+                  });
+            },
           ),
           ListTile(
             leading: Icon(Icons.wb_sunny),
@@ -254,12 +223,18 @@ class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
             leading: Icon(Icons.details),
             title: Text("Modify Restaurant Description"),
             trailing: Icon(Icons.edit),
-            onTap: () => _modifyTextField(
-              context: context,
-              textController: descriptionController,
-              hintText: "Description",
-              onConfirm: merchantData.setMerchantDescription,
-            ),
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return ModifyTextField(
+                      context: context,
+                      textController: descriptionController,
+                      hintText: "Description",
+                      onConfirm: merchantData.setMerchantDescription,
+                    );
+                  });
+            },
           ),
           ListTile(
             leading: Icon(Icons.do_not_disturb_alt),
@@ -294,24 +269,36 @@ class _AdminAddMerchantScreenState extends State<AdminAddMerchantScreen> {
             leading: Icon(Icons.email),
             title: Text(merchantData.getMerchantEmail()),
             trailing: Icon(Icons.edit),
-            onTap: () => _modifyTextField(
-              hintText: "Email",
-              context: context,
-              textController: emailController,
-              onConfirm: merchantData.setMerchantEmail,
-            ),
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return ModifyTextField(
+                      hintText: "Email",
+                      context: context,
+                      textController: emailController,
+                      onConfirm: merchantData.setMerchantEmail,
+                    );
+                  });
+            },
           ),
           ListTile(
             leading: Icon(Icons.phone),
             title: Text(merchantData.getMerchantPhoneNumber()),
             trailing: Icon(Icons.edit),
-            onTap: () => _modifyTextField(
-              hintText: "Phone Number",
-              context: context,
-              textController: phoneNumberController,
-              keyboardType: TextInputType.phone,
-              onConfirm: merchantData.setMerchantPhoneNumber,
-            ),
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return ModifyTextField(
+                      hintText: "Phone Number",
+                      context: context,
+                      textController: phoneNumberController,
+                      keyboardType: TextInputType.phone,
+                      onConfirm: merchantData.setMerchantPhoneNumber,
+                    );
+                  });
+            },
           ),
           TextField(
             obscureText: merchantData.isPasswordHidden,

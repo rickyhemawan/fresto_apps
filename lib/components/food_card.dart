@@ -5,7 +5,9 @@ import 'package:fresto_apps/components/round_icon_button.dart';
 import 'package:fresto_apps/components/text_and_image_progress_animation.dart';
 import 'package:fresto_apps/models/menu.dart';
 import 'package:fresto_apps/models/merchant.dart';
+import 'package:fresto_apps/models_data/merchant_data/merchant_modify_menu_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
+import 'package:provider/provider.dart';
 
 class LoadingFoodCard extends StatelessWidget {
   @override
@@ -292,12 +294,29 @@ class _FoodCardWithOrderState extends State<FoodCardWithOrder> {
 
 class FoodCardBig extends StatelessWidget {
   final String foodImageUrl;
+  final Widget foodImage;
   final String foodName;
   final String foodPrice;
   final String foodDescription;
 
   FoodCardBig(
-      {this.foodImageUrl, this.foodName, this.foodPrice, this.foodDescription});
+      {this.foodImageUrl,
+      this.foodName,
+      this.foodPrice,
+      this.foodDescription,
+      this.foodImage});
+
+  Widget getImage() {
+    if (foodImage != null) {
+      return foodImage;
+    }
+    return CachedNetworkImage(
+      height: 180.0,
+      width: double.infinity,
+      imageUrl: foodImageUrl ?? kDummyFoodImage,
+      fit: BoxFit.cover,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -310,12 +329,7 @@ class FoodCardBig extends StatelessWidget {
             children: <Widget>[
               ClipRRect(
                 borderRadius: BorderRadius.circular(3.0),
-                child: CachedNetworkImage(
-                  height: 180.0,
-                  width: double.infinity,
-                  imageUrl: foodImageUrl ?? kDummyFoodImage,
-                  fit: BoxFit.cover,
-                ),
+                child: getImage(),
               ),
               Container(
                 padding: EdgeInsets.all(8.0),
@@ -356,7 +370,8 @@ class FoodCardBig extends StatelessWidget {
 
 class FoodCardWithEdit extends StatelessWidget {
   final Menu menu;
-  FoodCardWithEdit({this.menu});
+  final BuildContext context;
+  FoodCardWithEdit({@required this.context, @required this.menu});
 
   @override
   Widget build(BuildContext context) {
@@ -406,7 +421,8 @@ class FoodCardWithEdit extends StatelessWidget {
                       onPressed: () {
                         Navigator.pushNamed(
                             context, kMerchantEditSingleMenuScreenRoute);
-                        //TODO change single menu data
+                        Provider.of<MerchantModifyMenuData>(context)
+                            .selectMenu(this.menu);
                       },
                       child: Text("Edit"),
                       color: Colors.green,

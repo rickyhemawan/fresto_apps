@@ -3,10 +3,12 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fresto_apps/models/menu.dart';
 import 'package:fresto_apps/utils/constants.dart';
+import 'package:image_picker/image_picker.dart';
 
-class MenuBaseData extends ChangeNotifier {
+abstract class MenuBaseData extends ChangeNotifier {
   final kDummyImage =
       CachedNetworkImage(imageUrl: kDummyDefaultImage, fit: BoxFit.cover);
 
@@ -14,7 +16,7 @@ class MenuBaseData extends ChangeNotifier {
   File file;
 
   void _createMenuInstance() {
-    if (menu = null) menu = Menu();
+    if (this.menu == null) this.menu = Menu(available: true);
   }
 
   void resetMenuValue() {
@@ -58,9 +60,19 @@ class MenuBaseData extends ChangeNotifier {
     return menu.description;
   }
 
+  bool getMenuAvailability() {
+    if (menu == null) return false;
+    return menu.available;
+  }
+
   //--------
   // Setters
   //--------
+
+  void setMenu(Menu menu) {
+    this.menu = menu;
+    notifyListeners();
+  }
 
   void setImageViaFile(File file) {
     _createMenuInstance();
@@ -76,20 +88,23 @@ class MenuBaseData extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setMenu(Menu menu) {
-    this.menu = menu;
-    notifyListeners();
-  }
-
   void setMenuName(String name) {
     _createMenuInstance();
     this.menu.name = name;
     notifyListeners();
   }
 
-  void setMenuPrice(double price) {
+  void setMenuPrice(String price) {
+    double realPrice;
+    try {
+      price = price.replaceAll(",", "");
+      realPrice = double.parse(price);
+    } catch (e) {
+      Fluttertoast.showToast(msg: price);
+      return;
+    }
     _createMenuInstance();
-    this.menu.price = price;
+    this.menu.price = realPrice;
     notifyListeners();
   }
 
@@ -97,5 +112,17 @@ class MenuBaseData extends ChangeNotifier {
     _createMenuInstance();
     this.menu.description = description;
     notifyListeners();
+  }
+
+  void toggleAvailability() {
+    _createMenuInstance();
+    this.menu.available = !this.menu.available;
+    notifyListeners();
+  }
+
+  Future selectImageFromGallery(BuildContext context) async {
+    print("selecting img from gallery");
+    var imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
+    setImageViaFile(imageFile);
   }
 }

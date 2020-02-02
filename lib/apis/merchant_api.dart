@@ -33,6 +33,7 @@ class MerchantAPI {
         .then((authResult) async {
       if (authResult is AuthResult) {
         FirebaseUser user = authResult.user;
+        merchant.userUid = user.uid;
         await firestore
             .collection(kMerchantCollection)
             .document(user.uid)
@@ -116,6 +117,26 @@ class MerchantAPI {
   }
 
   static Future<String> addMenusToMerchant(
+      {@required Merchant merchant, @required List<Menu> menus}) async {
+    if (merchant == null) return kNullMerchantName;
+    if (merchant.userUid == null) return kNullMerchantName;
+    if (menus == null) return kNullMenus;
+    if (menus == []) return kNullMenus;
+    try {
+      await Firestore.instance
+          .collection(kMerchantCollection)
+          .document(merchant.userUid)
+          .updateData({
+        "menus": merchant.encodeMenusToJson(menus),
+      });
+    } catch (e) {
+      print(e.toString());
+      return kErrorFailedToUpdateMenus;
+    }
+    return null;
+  }
+
+  static Future<String> modifyMenusToMerchant(
       {@required Merchant merchant, @required List<Menu> menus}) async {
     if (merchant == null) return kNullMerchantName;
     if (merchant.userUid == null) return kNullMerchantName;

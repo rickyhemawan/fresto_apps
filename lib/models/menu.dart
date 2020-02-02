@@ -10,7 +10,7 @@ class Menu {
 
   Menu.fromJson(Map<String, dynamic> json) {
     this.imageUrl = json["imageUrl"];
-    this.price = json["price"];
+    this.price = json["price"].toDouble();
     this.description = json["description"];
     this.name = json["name"];
     this.available = json["available"];
@@ -23,4 +23,23 @@ class Menu {
         "name": this.name,
         "available": this.available,
       };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Menu &&
+          runtimeType == other.runtimeType &&
+          imageUrl == other.imageUrl &&
+          price == other.price &&
+          description == other.description &&
+          name == other.name &&
+          available == other.available;
+
+  @override
+  int get hashCode =>
+      imageUrl.hashCode ^
+      price.hashCode ^
+      description.hashCode ^
+      name.hashCode ^
+      available.hashCode;
 }

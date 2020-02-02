@@ -49,6 +49,8 @@ const kNullMerchantAddress = "Merchant Address cannot be empty";
 const kNullOperationHour = "Merchant Operating hour cannot be empty";
 const kNullPhoneNumber = "Merchant Phone Number cannot be empty";
 const kNullMenus = "Menus cannot be empty";
+const kNullMenuName = "Menu Name cannot be empty";
+const kNullPrice = "Price cannot be empty";
 
 // With Internet
 const kErrorUserNotRegistered = "User is not available";

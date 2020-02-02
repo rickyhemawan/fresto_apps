@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fresto_apps/components/food_card.dart';
 import 'package:fresto_apps/models_data/merchant_data/merchant_data.dart';
+import 'package:fresto_apps/models_data/merchant_data/merchant_modify_menu_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
 import 'package:provider/provider.dart';
 
@@ -44,8 +45,10 @@ class _MerchantMenuListScreenState extends State<MerchantMenuListScreen> {
             ),
           ),
           floatingActionButton: FloatingActionButton(
-            onPressed: () =>
-                Navigator.pushNamed(context, kMerchantAddSingleMenuScreenRoute),
+            onPressed: () {
+              Provider.of<MerchantModifyMenuData>(context).resetMenuValue();
+              Navigator.pushNamed(context, kMerchantAddSingleMenuScreenRoute);
+            },
             child: Icon(Icons.add),
           ),
         );

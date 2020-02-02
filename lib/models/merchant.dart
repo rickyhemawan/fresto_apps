@@ -91,7 +91,7 @@ class Merchant extends User {
 
   @override
   String toString() {
-    return 'Merchant{merchantName: $merchantName, locationCoordinate: $locationCoordinate, locationName: $locationName, imageUrl: $imageUrl, openHour: $openHour, closeHour: $closeHour, dayOff: $dayOff, outOfOrder: $outOfOrder, menus: $menus, description: $description}';
+    return 'userUid: $userUid Merchant{merchantName: $merchantName, locationCoordinate: $locationCoordinate, locationName: $locationName, imageUrl: $imageUrl, openHour: $openHour, closeHour: $closeHour, dayOff: $dayOff, outOfOrder: $outOfOrder, menus: $menus, description: $description}';
   }
 
   @override
