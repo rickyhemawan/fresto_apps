@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:fresto_apps/components/bottom_navigation_icon.dart';
 import 'package:fresto_apps/components/fab_with_notifications.dart';
 import 'package:fresto_apps/models_data/client_data/client_data.dart';
+import 'package:fresto_apps/models_data/client_data/client_order_data.dart';
 import 'package:fresto_apps/models_data/merchants_data.dart';
 import 'package:fresto_apps/screens/account_screen.dart';
 import 'package:fresto_apps/screens/home_screen.dart';
@@ -55,7 +56,10 @@ class _MainScreenState extends State<MainScreen>
           child: _bodyList[_page],
           bucket: _bucket,
         ),
-        floatingActionButton: FABWithNotifications(),
+        floatingActionButton:
+            Provider.of<ClientOrderData>(context).isMenuEmpty()
+                ? SizedBox()
+                : FABWithNotifications(),
       ),
     );
   }

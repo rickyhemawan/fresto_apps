@@ -1,11 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fresto_apps/components/food_card.dart';
 import 'package:fresto_apps/components/schedule_card.dart';
 import 'package:fresto_apps/components/title_and_subtitle_row_text.dart';
+import 'package:fresto_apps/models_data/client_data/client_merchant_data.dart';
+import 'package:fresto_apps/models_data/client_data/client_order_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
+import 'package:provider/provider.dart';
 
 class CreateOrderScreen extends StatefulWidget {
   static const route = '/detailed_order_page';
@@ -20,9 +24,13 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
 
   String _picked = "Pay Half";
 
-  Widget _foodList() {
+  Widget _foodList(ClientOrderData orderData) {
     return InkWell(
-      onTap: () => Navigator.pushNamed(context, kMerchantDetailScreenRoute),
+      onTap: () {
+        Provider.of<ClientMerchantData>(context)
+            .setMerchant(merchant: orderData.merchant);
+        Navigator.pushNamed(context, kMerchantDetailScreenRoute);
+      },
       child: Column(
         children: <Widget>[
           Container(
@@ -39,9 +47,11 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
           ),
           ListView.builder(
             itemBuilder: (context, index) {
-              return FoodCardWithQuantity();
+              return FoodCardWithQuantity(
+                menuHelper: orderData.order.menus[index],
+              );
             },
-            itemCount: 1,
+            itemCount: orderData.order.menus.length,
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
           )
@@ -50,18 +60,23 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     );
   }
 
-  Widget _timeSection() {
+  Widget _timeSection(ClientOrderData orderData) {
     return InformationCard(
       color: Colors.blue,
-      title: 'Pick Up Time',
-      content: '31 December 2019 at 7:00 PM',
-      onPressed: () {
-        Fluttertoast.showToast(msg: 'Cannot Change Date Once being ordered');
+      title: 'Reservation Date',
+      content: orderData.getReservationDate(),
+      onPressed: () async {
+        DateTime x;
+        await DatePicker.showDateTimePicker(context,
+            minTime: orderData.minimumDate,
+            maxTime: orderData.maximumDate,
+            onConfirm: (time) => x = time);
+        print(x);
       },
     );
   }
 
-  Widget _merchantDetailsSection() {
+  Widget _merchantDetailsSection(ClientOrderData orderData) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
       child: Column(
@@ -79,15 +94,18 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
             ),
           ),
           ListTile(
-            onTap: () =>
-                Navigator.pushNamed(context, kMerchantDetailScreenRoute),
+            onTap: () {
+              Provider.of<ClientMerchantData>(context)
+                  .setMerchant(merchant: orderData.merchant);
+              Navigator.pushNamed(context, kMerchantDetailScreenRoute);
+            },
             leading: CachedNetworkImage(
-              imageUrl: kDummyMerchantImage,
+              imageUrl: orderData.merchant.imageUrl,
               fit: BoxFit.fill,
             ),
-            title: Text(kDummyMerchantName),
+            title: Text(orderData.merchant.merchantName),
             subtitle: Text(
-              kDummyDescription,
+              orderData.merchant.description ?? "No Description",
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -98,7 +116,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
               "Address",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            subtitle: Text(kDummyMerchantAddress),
+            subtitle: Text(orderData.merchant.locationName),
             trailing: Icon(
               Icons.location_on,
               color: Colors.orange,
@@ -110,7 +128,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     );
   }
 
-  Widget _paymentDetailsSection() {
+  Widget _paymentDetailsSection(ClientOrderData orderData) {
     return Card(
       margin: EdgeInsets.symmetric(
         horizontal: 8.0,
@@ -118,39 +136,27 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
       ),
       child: Column(
         children: <Widget>[
-          _foodList(),
+          _foodList(orderData),
           TitleAndSubtitleRowText(
             title: "Product Total",
-            description: "Rp 400000.0",
+            description: orderData.getProductTotal(),
             fontSize: 16.0,
           ),
           TitleAndSubtitleRowText(
             title: "Product Tax",
-            description: "Rp 40000.0",
+            description: orderData.getTax(),
             fontSize: 16.0,
           ),
           Divider(),
           TitleAndSubtitleRowText(
             title: "Grand Total",
-            description: "Rp 440000.0",
+            description: orderData.getGrandTotal(),
             fontSize: 20,
             titleColor: Colors.blueGrey,
             descriptionColor: Colors.blue,
           ),
         ],
       ),
-    );
-  }
-
-  Widget _paymentMethodSection() {
-    return InformationCard(
-      icon: Icons.attach_money,
-      color: Colors.green,
-      title: 'Payment Method',
-      content: 'OVO',
-      onPressed: () {
-        Fluttertoast.showToast(msg: 'Cannot Change Date Once being ordered');
-      },
     );
   }
 
@@ -162,7 +168,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Container(
-            padding: EdgeInsets.only(top: 8.0, left: 24.0, bottom: 4.0),
+            padding: EdgeInsets.only(top: 8.0, left: 8.0, bottom: 4.0),
             child: Text(
               "Down Payment",
               style: TextStyle(
@@ -214,7 +220,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     );
   }
 
-  Widget _cancelButtonSection() {
+  Widget _cancelButtonSection(ClientOrderData orderData) {
     return Container(
       color: Colors.red,
       padding: EdgeInsets.all(8.0),
@@ -226,7 +232,8 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
       alignment: Alignment.center,
       child: InkWell(
           onTap: () {
-            Fluttertoast.showToast(msg: "Order Pressed");
+            orderData.clearMerchant();
+            Fluttertoast.showToast(msg: "Order Canceled");
             Navigator.pop(context);
           },
           child: Text(
@@ -242,25 +249,28 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Create Reservation'),
-      ),
-      body: Container(
-        child: ListView(
-          shrinkWrap: true,
-          scrollDirection: Axis.vertical,
-          children: <Widget>[
-            _timeSection(),
-            _paymentMethodSection(),
-            _merchantDetailsSection(),
-            _paymentDetailsSection(),
-            _downPaymentSection(),
-            _confirmButtonSection(),
-            _cancelButtonSection(),
-          ],
-        ),
-      ),
+    return Consumer<ClientOrderData>(
+      builder: (context, orderData, child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('Create Reservation'),
+          ),
+          body: Container(
+            child: ListView(
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+              children: <Widget>[
+                _timeSection(orderData),
+                _merchantDetailsSection(orderData),
+                _paymentDetailsSection(orderData),
+                _downPaymentSection(),
+                _confirmButtonSection(),
+                _cancelButtonSection(orderData),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

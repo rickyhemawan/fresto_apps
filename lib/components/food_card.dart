@@ -1,10 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fresto_apps/components/round_icon_button.dart';
 import 'package:fresto_apps/components/text_and_image_progress_animation.dart';
+import 'package:fresto_apps/models/helper/menu_helper.dart';
 import 'package:fresto_apps/models/menu.dart';
 import 'package:fresto_apps/models/merchant.dart';
+import 'package:fresto_apps/models_data/client_data/client_merchant_data.dart';
 import 'package:fresto_apps/models_data/merchant_data/merchant_modify_menu_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
 import 'package:provider/provider.dart';
@@ -62,11 +63,8 @@ class FoodCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        print("Food Card Pressed");
-        Fluttertoast.showToast(
-          msg: "Food Card Pressed",
-          gravity: ToastGravity.CENTER,
-        );
+        Provider.of<ClientMerchantData>(context)
+            .setMerchant(merchant: this.merchant);
         Navigator.pushNamed(context, kMerchantDetailScreenRoute);
       },
       child: Card(
@@ -129,6 +127,10 @@ class FoodCard extends StatelessWidget {
 }
 
 class FoodCardWithQuantity extends StatelessWidget {
+  final MenuHelper menuHelper;
+
+  FoodCardWithQuantity({@required this.menuHelper});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -145,7 +147,7 @@ class FoodCardWithQuantity extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(3.0),
                   child: CachedNetworkImage(
-                    imageUrl: kDummyFoodImage,
+                    imageUrl: this.menuHelper.imageUrl ?? kDummyDefaultImage,
                     height: 72.0,
                     width: 72.0,
                     fit: BoxFit.cover,
@@ -165,7 +167,7 @@ class FoodCardWithQuantity extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      kDummyFoodName,
+                      this.menuHelper.name ?? "No Name",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
@@ -173,7 +175,7 @@ class FoodCardWithQuantity extends StatelessWidget {
                     ),
                     SizedBox(height: 8.0),
                     Text(
-                      kDummyFoodPrice,
+                      this.menuHelper.price.toString() ?? "No Price",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
@@ -182,7 +184,7 @@ class FoodCardWithQuantity extends StatelessWidget {
                     Container(
                       width: double.infinity,
                       child: Text(
-                        "Quantity : 10",
+                        "Quantity : ${this.menuHelper.quantity}",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.blue,
@@ -203,24 +205,12 @@ class FoodCardWithQuantity extends StatelessWidget {
   }
 }
 
-class FoodCardWithOrder extends StatefulWidget {
-  @override
-  _FoodCardWithOrderState createState() => _FoodCardWithOrderState();
-}
-
-class _FoodCardWithOrderState extends State<FoodCardWithOrder> {
-  int _counter = 0;
-
-  void _addButton() {
-    setState(() => _counter++);
-  }
-
-  void _minusButton() {
-    if (_counter == 0) {
-      return;
-    }
-    setState(() => _counter--);
-  }
+class FoodCardWithOrder extends StatelessWidget {
+  final Menu menu;
+  final int quantity;
+  final Function onAdd;
+  final Function onMinus;
+  FoodCardWithOrder({this.menu, this.quantity, this.onAdd, this.onMinus});
 
   @override
   Widget build(BuildContext context) {
@@ -232,10 +222,13 @@ class _FoodCardWithOrderState extends State<FoodCardWithOrder> {
           children: <Widget>[
             ClipRRect(
               borderRadius: BorderRadius.circular(3.0),
-              child: CachedNetworkImage(
-                height: 180.0,
-                imageUrl: kDummyFoodImage,
-                fit: BoxFit.cover,
+              child: Container(
+                width: double.infinity,
+                child: CachedNetworkImage(
+                  height: 180.0,
+                  imageUrl: menu.imageUrl ?? kDummyDefaultImage,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             Container(
@@ -244,7 +237,7 @@ class _FoodCardWithOrderState extends State<FoodCardWithOrder> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    kDummyFoodName,
+                    menu.name ?? "No Name",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
@@ -252,7 +245,7 @@ class _FoodCardWithOrderState extends State<FoodCardWithOrder> {
                   ),
                   SizedBox(height: 8.0),
                   Text(
-                    kDummyFoodPrice,
+                    menu.price.toString() ?? "No Price",
                     style: TextStyle(
                       color: Colors.green,
                       fontWeight: FontWeight.bold,
@@ -260,7 +253,7 @@ class _FoodCardWithOrderState extends State<FoodCardWithOrder> {
                   ),
                   SizedBox(height: 8.0),
                   Text(
-                    kDummyDescription,
+                    menu.description ?? "No Description",
                     textAlign: TextAlign.justify,
                   ),
                   Row(
@@ -268,17 +261,17 @@ class _FoodCardWithOrderState extends State<FoodCardWithOrder> {
                     children: <Widget>[
                       RoundIconButton(
                         icon: Icons.chevron_left,
-                        onPressed: _minusButton,
+                        onPressed: this.onMinus,
                       ),
                       Text(
-                        "$_counter",
+                        "${this.quantity}",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       RoundIconButton(
                         icon: Icons.chevron_right,
-                        onPressed: _addButton,
+                        onPressed: this.onAdd,
                       ),
                     ],
                   ),

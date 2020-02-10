@@ -1,9 +1,11 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fresto_apps/components/fab_with_notifications.dart';
 import 'package:fresto_apps/components/food_card.dart';
-import 'package:fresto_apps/utils/constants.dart';
+import 'package:fresto_apps/models/menu.dart';
+import 'package:fresto_apps/models_data/client_data/client_merchant_data.dart';
+import 'package:fresto_apps/models_data/client_data/client_order_data.dart';
+import 'package:provider/provider.dart';
 
 class MerchantDetailScreen extends StatefulWidget {
   @override
@@ -11,21 +13,18 @@ class MerchantDetailScreen extends StatefulWidget {
 }
 
 class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
-  Widget _appBar(BuildContext context) {
+  Widget _appBar(BuildContext context, ClientMerchantData merchantData) {
     return SliverAppBar(
       title: Text("Merchant Details"),
       expandedHeight: 200,
       flexibleSpace: FlexibleSpaceBar(
-        background: CachedNetworkImage(
-          imageUrl: kDummyMerchantImage,
-          fit: BoxFit.cover,
-        ),
+        background: merchantData.getMerchantImage(),
       ),
       pinned: true,
     );
   }
 
-  Widget _statusSection() {
+  Widget _statusSection(ClientMerchantData merchantData) {
     return SliverToBoxAdapter(
       child: Container(
         padding: EdgeInsets.all(8.0),
@@ -37,7 +36,7 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
             Expanded(
               flex: 1,
               child: Text(
-                kDummyMerchantOpenStatus,
+                merchantData.getMerchantOperatingHour(),
                 textAlign: TextAlign.justify,
               ),
             ),
@@ -50,14 +49,19 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
               child: Container(
                 padding: EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(3.0)),
-                    border: Border.all(
-                      color: Colors.green,
-                    )),
+                  borderRadius: BorderRadius.all(Radius.circular(3.0)),
+                  border: Border.all(
+                    color: merchantData.isMerchantOpen()
+                        ? Colors.green
+                        : Colors.red,
+                  ),
+                ),
                 child: Text(
-                  "Open",
+                  merchantData.isMerchantOpen() ? "Open" : "Close",
                   style: TextStyle(
-                    color: Colors.green,
+                    color: merchantData.isMerchantOpen()
+                        ? Colors.green
+                        : Colors.red,
                   ),
                 ),
               ),
@@ -68,7 +72,7 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
     );
   }
 
-  Widget _addressSection() {
+  Widget _addressSection(ClientMerchantData merchantData) {
     return SliverToBoxAdapter(
       child: Container(
         padding: EdgeInsets.all(8.0),
@@ -80,7 +84,7 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
             Expanded(
               flex: 1,
               child: Text(
-                kDummyMerchantAddress,
+                merchantData.getMerchantAddress(),
                 textAlign: TextAlign.justify,
               ),
             ),
@@ -110,7 +114,7 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
     );
   }
 
-  Widget _descriptionSection() {
+  Widget _descriptionSection(ClientMerchantData merchantData) {
     return SliverToBoxAdapter(
       child: Container(
         padding: EdgeInsets.all(8.0),
@@ -118,20 +122,29 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
           horizontal: 8.0,
         ),
         child: Text(
-          kDummyDescription,
+          merchantData.getMerchantDescription(),
           textAlign: TextAlign.justify,
         ),
       ),
     );
   }
 
-  Widget _menuSection() {
+  Widget _menuSection(ClientMerchantData merchantData) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
-        (context, int) {
-          return FoodCardWithOrder();
+        (context, index) {
+          Menu menu = merchantData.getMenus()[index];
+          return FoodCardWithOrder(
+            menu: menu,
+            onAdd: () => Provider.of<ClientOrderData>(context)
+                .addMenu(menu: menu, merchant: merchantData.merchant),
+            onMinus: () =>
+                Provider.of<ClientOrderData>(context).removeMenu(menu: menu),
+            quantity: Provider.of<ClientOrderData>(context)
+                .getMenuQuantity(menu: menu),
+          );
         },
-        childCount: 8,
+        childCount: merchantData.getMenus().length,
       ),
     );
   }
@@ -150,24 +163,31 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: <Widget>[
-            _appBar(context),
-            _sectionTitle(kDummyMerchantName),
-            _statusSection(),
-            _sectionTitle("Address"),
-            _addressSection(),
-            _sectionTitle("Description"),
-            _descriptionSection(),
-            _sectionTitle("Menu"),
-            _menuSection(),
-          ],
-        ),
-      ),
-      floatingActionButton: FABWithNotifications(),
+    return Consumer<ClientMerchantData>(
+      builder: (context, merchantData, child) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: SafeArea(
+            child: CustomScrollView(
+              slivers: <Widget>[
+                _appBar(context, merchantData),
+                _sectionTitle(merchantData.merchant.merchantName),
+                _statusSection(merchantData),
+                _sectionTitle("Address"),
+                _addressSection(merchantData),
+                _sectionTitle("Description"),
+                _descriptionSection(merchantData),
+                _sectionTitle("Menu"),
+                _menuSection(merchantData),
+              ],
+            ),
+          ),
+          floatingActionButton:
+              Provider.of<ClientOrderData>(context).isMenuEmpty()
+                  ? SizedBox()
+                  : FABWithNotifications(),
+        );
+      },
     );
   }
 }

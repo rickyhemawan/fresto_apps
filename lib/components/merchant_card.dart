@@ -2,7 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fresto_apps/components/text_and_image_progress_animation.dart';
 import 'package:fresto_apps/models/merchant.dart';
+import 'package:fresto_apps/models_data/client_data/client_merchant_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
+import 'package:provider/provider.dart';
 
 class LoadingMerchantCard extends StatelessWidget {
   @override
@@ -53,6 +55,8 @@ class MerchantCard extends StatelessWidget {
           onTap();
           return;
         }
+        Provider.of<ClientMerchantData>(context)
+            .setMerchant(merchant: merchant);
         Navigator.pushNamed(context, kMerchantDetailScreenRoute);
       },
       child: Card(

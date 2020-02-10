@@ -1,10 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fresto_apps/components/text_and_image_progress_animation.dart';
 import 'package:fresto_apps/models/menu.dart';
 import 'package:fresto_apps/models/merchant.dart';
+import 'package:fresto_apps/models_data/client_data/client_merchant_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
+import 'package:provider/provider.dart';
 
 class LoadingHomeVerticalCard extends StatelessWidget {
   @override
@@ -54,11 +55,9 @@ class HomeVerticalCard extends StatelessWidget {
       width: cardWidth,
       child: GestureDetector(
         onTap: () {
+          Provider.of<ClientMerchantData>(context)
+              .setMerchant(merchant: this.merchant);
           Navigator.pushNamed(context, kMerchantDetailScreenRoute);
-          Fluttertoast.showToast(
-            msg: "Vertical Card Tapped!",
-            gravity: ToastGravity.CENTER,
-          );
         },
         child: Card(
           child: Padding(

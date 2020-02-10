@@ -22,7 +22,7 @@ class TitleAndSubtitleRowText extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Expanded(
-            flex: 2,
+            flex: 0,
             child: Text(
               this.title,
               style: TextStyle(
@@ -34,7 +34,7 @@ class TitleAndSubtitleRowText extends StatelessWidget {
             ),
           ),
           Expanded(
-            flex: 3,
+            flex: 1,
             child: Text(
               description,
               style: TextStyle(
