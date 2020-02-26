@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fresto_apps/components/order_card.dart';
+import 'package:fresto_apps/models_data/client_data/client_order_timeline_data.dart';
+import 'package:provider/provider.dart';
 
 class OrderTimelineScreen extends StatefulWidget {
   const OrderTimelineScreen({Key key}) : super(key: key);
@@ -16,24 +17,23 @@ class _OrderTimelineScreenState extends State<OrderTimelineScreen> {
     );
   }
 
-  Widget _contentSection() {
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (context, int) {
-          return OrderCard();
-        },
-        childCount: 1,
-      ),
+  Widget _contentSection(ClientOrderTimelineData timelineData) {
+    return SliverToBoxAdapter(
+      child: timelineData.streamOrders(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: <Widget>[
-        _appBar(),
-        _contentSection(),
-      ],
+    return Consumer<ClientOrderTimelineData>(
+      builder: (context, timelineData, child) {
+        return CustomScrollView(
+          slivers: <Widget>[
+            _appBar(),
+            _contentSection(timelineData),
+          ],
+        );
+      },
     );
   }
 }

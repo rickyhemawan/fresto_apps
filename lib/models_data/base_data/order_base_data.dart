@@ -19,6 +19,7 @@ abstract class OrderBaseData extends ChangeNotifier {
       this.order = Order();
       this.order.menus = [];
       this.order.orderStatus = [];
+      this.order.orderStatus.add(OrderStatus.kWaitingMerchantConfirmation);
       notifyListeners();
     }
   }

@@ -13,6 +13,24 @@ class MenuHelper extends Menu {
     this.available = menu.available;
   }
 
+  MenuHelper.fromJson(Map<String, dynamic> json) {
+    this.imageUrl = json["imageUrl"];
+    this.price = json["price"].toDouble();
+    this.description = json["description"];
+    this.name = json["name"];
+    this.available = json["available"];
+    this.quantity = json["quantity"];
+  }
+
+  Map<String, dynamic> toJson() => {
+        "imageUrl": this.imageUrl,
+        "price": this.price,
+        "description": this.description,
+        "name": this.name,
+        "available": this.available,
+        "quantity": this.quantity,
+      };
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -20,4 +38,9 @@ class MenuHelper extends Menu {
 
   @override
   int get hashCode => super.hashCode;
+
+  @override
+  String toString() {
+    return super.toString() + 'MenuHelper{quantity: $quantity}';
+  }
 }

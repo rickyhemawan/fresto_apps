@@ -1,48 +1,89 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:fresto_apps/apis/order_api.dart';
 import 'package:fresto_apps/models/helper/menu_helper.dart';
 import 'package:fresto_apps/models/menu.dart';
 import 'package:fresto_apps/models/merchant.dart';
 import 'package:fresto_apps/models_data/base_data/order_base_data.dart';
 
-class ClientOrderData extends OrderBaseData {
+class ClientCreateOrderData extends OrderBaseData {
   Merchant merchant;
-  ClientOrderData();
+  ClientCreateOrderData() {
+    this.minimumDate = DateTime.now().add(Duration(days: 1));
+    this.maximumDate = DateTime.now().add(Duration(days: 30));
+  }
 
-  DateTime minimumDate = DateTime.now().add(Duration(days: 1));
-  DateTime maximumDate = DateTime.now().add(Duration(days: 30));
+  DateTime minimumDate;
+  DateTime maximumDate;
+  bool isLoading = false;
 
   void setMerchant(Merchant merchant) {
+    createOrderInstance();
     this.order.merchantUid = merchant.userUid;
     this.merchant = merchant;
+    setDateBasedOnMerchant(merchant);
     notifyListeners();
   }
 
-  // TODO : Order API
+  void setLoading(bool val) {
+    isLoading = val;
+    notifyListeners();
+  }
+
+  void setDateBasedOnMerchant(Merchant merchant) {
+    DateTime tempDate = DateTime.now();
+    this.minimumDate = DateTime(
+      tempDate.year,
+      tempDate.month,
+      tempDate.day,
+      merchant.openHour,
+    ).add(Duration(days: 1));
+    this.maximumDate = DateTime(
+      tempDate.year,
+      tempDate.month,
+      tempDate.day,
+      merchant.closeHour,
+    ).add(Duration(days: 30));
+    notifyListeners();
+  }
+
   // TODO : On tap url launcher (Address)
-  // TODO : Future<String> submit button
+
+  Future<String> submitOrder() async {
+    String userUid;
+    await FirebaseAuth.instance.currentUser().then((user) {
+      userUid = user.uid;
+    }, onError: (err) {
+      return err;
+    });
+    this.order.userUid = userUid;
+    this.order.merchantUid = this.merchant.userUid;
+    this.order.total =
+        double.parse((_calculateProductsTotal() * 1.1).toStringAsFixed(2));
+    String res = await OrderAPI.createOrder(order: this.order);
+    if (res == null) clearMerchant();
+    return res;
+  }
 
   String getReservationDate() {
-    // TODO : Setter and getter for date
-    return "Date not settled yet";
+    if (this.order == null) return "Date not settled yet";
+    if (this.order.orderDate == null) return "Date not settled yet";
+    return this.order.formattedTime;
   }
 
   void clearMerchant() {
-    this.merchant = null;
     this.order.merchantUid = null;
     this.order.menus = [];
     notifyListeners();
   }
 
-  void addMenu({@required Menu menu, @required Merchant merchant}) {
-    if (menu == null) return;
-    if (merchant == null) return;
+  String addMenu({@required Menu menu, @required Merchant merchant}) {
+    if (menu == null) return null;
+    if (merchant == null) return null;
 
     if (this.order.merchantUid != null) {
       if (this.order.merchantUid != merchant.userUid) {
-        Fluttertoast.showToast(
-            msg: "Please Cancel the previous order before creating a new one");
-        return;
+        return "Please Cancel the previous order before creating a new one";
       }
     } else {
       setMerchant(merchant);
@@ -53,12 +94,13 @@ class ClientOrderData extends OrderBaseData {
       if (this.order.menus[i] == helper) {
         this.order.menus[i].quantity++;
         notifyListeners();
-        return;
+        return null;
       }
     }
     helper.quantity = 1;
     this.order.menus.add(helper);
     notifyListeners();
+    return null;
   }
 
   void removeMenu({@required Menu menu}) {
@@ -115,7 +157,7 @@ class ClientOrderData extends OrderBaseData {
     return "Rp ${(_calculateProductsTotal() / 10).toStringAsFixed(2)}";
   }
 
-  String getGrandTotal() {
+  String getGrandTotalString() {
     return "Rp ${(_calculateProductsTotal() * 1.1).toStringAsFixed(2)}";
   }
 }

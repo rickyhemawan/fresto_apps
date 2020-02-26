@@ -42,4 +42,10 @@ class Menu {
       description.hashCode ^
       name.hashCode ^
       available.hashCode;
+
+  @override
+  String toString() {
+    return 'Menu{imageUrl: $imageUrl, price: $price, description: $description, name: $name, available: $available}';
+  }
+
 }

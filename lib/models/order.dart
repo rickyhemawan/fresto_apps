@@ -1,4 +1,5 @@
 import 'package:fresto_apps/models/helper/menu_helper.dart';
+import 'package:intl/intl.dart';
 
 class OrderStatus {
   static const kWaitingMerchantConfirmation = "WAITING_MERCHANT_CONFIRMATION";
@@ -23,7 +24,68 @@ class Order {
   String paymentStatus;
   double total;
   DateTime orderDate;
+  String paymentUid;
+
+  Order();
+
+  Order.fromJson(Map<String, dynamic> json) {
+    this.orderUid = json["uid"];
+    this.merchantUid = json["merchantUid"];
+    this.userUid = json["userUid"];
+    this.menus = decodeMenusFromJson(json["menus"]);
+    this.orderStatus = decodeOrderStatusFromJson(json["orderStatus"]);
+    this.paymentStatus = json["paymentStatus"];
+    this.total = json["total"];
+    this.orderDate = DateTime.parse(json["orderDate"].toString());
+    this.paymentUid = json["paymentUid"];
+  }
+
+  Map<String, dynamic> toJson() => {
+        "uid": this.orderUid,
+        "merchantUid": this.merchantUid,
+        "userUid": this.userUid,
+        "menus": encodeMenusToJson(this.menus),
+        "orderStatus": this.orderStatus,
+        "paymentStatus": paymentStatus,
+        "total": this.total,
+        "orderDate": this.orderDate.toIso8601String(),
+        "paymentUid": this.paymentUid,
+      };
+
+  List<MenuHelper> decodeMenusFromJson(List<dynamic> dynamics) {
+    List<MenuHelper> tempMenus = [];
+    if (dynamics == null) return tempMenus;
+    dynamics.forEach((e) {
+      print("decodedFromJson => ${e.toString()}");
+      Map<String, dynamic> casted =
+          Map.castFrom<dynamic, dynamic, String, dynamic>(e);
+      tempMenus.add(MenuHelper.fromJson(casted));
+    });
+    return tempMenus;
+  }
+
+  List<String> decodeOrderStatusFromJson(List<dynamic> dynamics) {
+    List<String> tempStatus = [];
+    if (dynamics == null) return tempStatus;
+    dynamics.forEach((e) => tempStatus.add(e.toString()));
+    return tempStatus;
+  }
+
+  List encodeMenusToJson(List<MenuHelper> list) {
+    List jsonList = List();
+    list.map((item) => jsonList.add(item.toJson())).toList();
+    return jsonList;
+  }
 
   String get lastOrderStatus => orderStatus.last;
   bool get isOrderConfirmed => lastOrderStatus == OrderStatus.kWaitingPayment;
+  String get formattedTime {
+    DateFormat dateFormat = DateFormat("d MMMM 'at' KK:mm a");
+    return dateFormat.format(this.orderDate);
+  }
+
+  @override
+  String toString() {
+    return 'Order{orderUid: $orderUid, merchantUid: $merchantUid, userUid: $userUid, menus: $menus, orderStatus: $orderStatus, paymentStatus: $paymentStatus, total: $total, orderDate: $orderDate}';
+  }
 }

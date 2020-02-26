@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:fresto_apps/models_data/client_data/client_order_data.dart';
+import 'package:fresto_apps/models_data/client_data/client_create_order_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
 import 'package:provider/provider.dart';
 
@@ -31,7 +31,7 @@ class FABWithNotifications extends StatelessWidget {
                 minHeight: 12,
               ),
               child: Text(
-                '${Provider.of<ClientOrderData>(context).getTotalItems()}',
+                '${Provider.of<ClientCreateOrderData>(context).getTotalItems()}',
                 style: new TextStyle(
                   color: Colors.white,
                   fontSize: 8,

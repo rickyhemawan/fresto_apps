@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class GoogleMapAPI {
   static final _searchByCoordinate =
@@ -22,5 +23,16 @@ class GoogleMapAPI {
     }
     throw Exception(
         "status code: ${response.statusCode}, body: ${response.body}");
+  }
+
+  static Future<String> openMap({@required String coordinate}) async {
+    String googleUrl =
+        'https://www.google.com/maps/search/?api=1&query=$coordinate';
+    if (await canLaunch(googleUrl)) {
+      await launch(googleUrl);
+      return null;
+    } else {
+      return 'Could not open the map.';
+    }
   }
 }

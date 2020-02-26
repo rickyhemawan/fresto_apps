@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fresto_apps/components/text_and_image_progress_animation.dart';
+import 'package:fresto_apps/models/merchant.dart';
+import 'package:fresto_apps/models/order.dart';
 import 'package:fresto_apps/screens/merchant_screens/merchant_order_details_screen.dart';
 import 'package:fresto_apps/utils/constants.dart';
 
@@ -51,6 +53,11 @@ class LoadingOrderCard extends StatelessWidget {
 }
 
 class OrderCard extends StatelessWidget {
+  final Order order;
+  final Merchant merchant;
+
+  OrderCard({@required this.order, @required this.merchant});
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -68,7 +75,7 @@ class OrderCard extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(3.0),
                   child: CachedNetworkImage(
-                    imageUrl: kDummyMerchantImage,
+                    imageUrl: merchant.imageUrl ?? kDummyMerchantImage,
                     height: 72.0,
                     width: 72.0,
                     fit: BoxFit.cover,
@@ -87,14 +94,14 @@ class OrderCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      kDummyMerchantName,
+                      merchant.merchantName ?? kDummyMerchantName,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
                       maxLines: 1,
                     ),
                     Text(
-                      "Upcoming Reservation, 31 December 2019 at 7:00 PM",
+                      "Upcoming Reservation, ${order.formattedTime}",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.orange,

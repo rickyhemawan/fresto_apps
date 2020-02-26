@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:fresto_apps/apis/google_map_api.dart';
 import 'package:fresto_apps/components/fab_with_notifications.dart';
 import 'package:fresto_apps/components/food_card.dart';
 import 'package:fresto_apps/models/menu.dart';
+import 'package:fresto_apps/models_data/client_data/client_create_order_data.dart';
 import 'package:fresto_apps/models_data/client_data/client_merchant_data.dart';
-import 'package:fresto_apps/models_data/client_data/client_order_data.dart';
 import 'package:provider/provider.dart';
 
 class MerchantDetailScreen extends StatefulWidget {
@@ -74,41 +75,42 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
 
   Widget _addressSection(ClientMerchantData merchantData) {
     return SliverToBoxAdapter(
-      child: Container(
-        padding: EdgeInsets.all(8.0),
-        margin: EdgeInsets.symmetric(
-          horizontal: 8.0,
-        ),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              flex: 1,
-              child: Text(
-                merchantData.getMerchantAddress(),
-                textAlign: TextAlign.justify,
-              ),
-            ),
-            Expanded(
-              flex: 0,
-              child: SizedBox(width: 8.0),
-            ),
-            Expanded(
-              flex: 0,
-              child: IconButton(
-                icon: Icon(
-                  Icons.location_searching,
-                  size: 24.0,
-                  color: Colors.orange,
+      child: InkWell(
+        onTap: () async {
+          String msg = await GoogleMapAPI.openMap(
+              coordinate: merchantData.merchant.locationCoordinate);
+          if (msg != null) Fluttertoast.showToast(msg: msg);
+        },
+        child: Container(
+          padding: EdgeInsets.all(8.0),
+          margin: EdgeInsets.symmetric(
+            horizontal: 8.0,
+          ),
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                flex: 1,
+                child: Text(
+                  merchantData.getMerchantAddress(),
+                  textAlign: TextAlign.justify,
                 ),
-                onPressed: () {
-                  Fluttertoast.showToast(
-                    msg: "Opening Google Map",
-                    gravity: ToastGravity.CENTER,
-                  );
-                },
               ),
-            ),
-          ],
+              Expanded(
+                flex: 0,
+                child: SizedBox(width: 8.0),
+              ),
+              Expanded(
+                flex: 0,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.location_searching,
+                    size: 24.0,
+                    color: Colors.orange,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -136,11 +138,16 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
           Menu menu = merchantData.getMenus()[index];
           return FoodCardWithOrder(
             menu: menu,
-            onAdd: () => Provider.of<ClientOrderData>(context)
-                .addMenu(menu: menu, merchant: merchantData.merchant),
-            onMinus: () =>
-                Provider.of<ClientOrderData>(context).removeMenu(menu: menu),
-            quantity: Provider.of<ClientOrderData>(context)
+            onAdd: () {
+              String msg = Provider.of<ClientCreateOrderData>(context)
+                  .addMenu(menu: menu, merchant: merchantData.merchant);
+              if (msg != null) {
+                Fluttertoast.showToast(msg: msg);
+              }
+            },
+            onMinus: () => Provider.of<ClientCreateOrderData>(context)
+                .removeMenu(menu: menu),
+            quantity: Provider.of<ClientCreateOrderData>(context)
                 .getMenuQuantity(menu: menu),
           );
         },
@@ -183,7 +190,7 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
             ),
           ),
           floatingActionButton:
-              Provider.of<ClientOrderData>(context).isMenuEmpty()
+              Provider.of<ClientCreateOrderData>(context).isMenuEmpty()
                   ? SizedBox()
                   : FABWithNotifications(),
         );

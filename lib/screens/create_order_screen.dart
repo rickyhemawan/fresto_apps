@@ -2,12 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:fresto_apps/apis/google_map_api.dart';
 import 'package:fresto_apps/components/food_card.dart';
 import 'package:fresto_apps/components/schedule_card.dart';
 import 'package:fresto_apps/components/title_and_subtitle_row_text.dart';
-import 'package:fresto_apps/models_data/client_data/client_merchant_data.dart';
-import 'package:fresto_apps/models_data/client_data/client_order_data.dart';
-import 'package:fresto_apps/utils/constants.dart';
+import 'package:fresto_apps/models_data/client_data/client_create_order_data.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
 import 'package:provider/provider.dart';
 
@@ -24,12 +23,10 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
 
   String _picked = "Pay Half";
 
-  Widget _foodList(ClientOrderData orderData) {
+  Widget _foodList(ClientCreateOrderData orderData) {
     return InkWell(
       onTap: () {
-        Provider.of<ClientMerchantData>(context)
-            .setMerchant(merchant: orderData.merchant);
-        Navigator.pushNamed(context, kMerchantDetailScreenRoute);
+        Navigator.pop(context);
       },
       child: Column(
         children: <Widget>[
@@ -60,23 +57,24 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     );
   }
 
-  Widget _timeSection(ClientOrderData orderData) {
+  Widget _timeSection(ClientCreateOrderData orderData) {
     return InformationCard(
       color: Colors.blue,
       title: 'Reservation Date',
       content: orderData.getReservationDate(),
       onPressed: () async {
-        DateTime x;
+        DateTime dateTime;
         await DatePicker.showDateTimePicker(context,
             minTime: orderData.minimumDate,
             maxTime: orderData.maximumDate,
-            onConfirm: (time) => x = time);
-        print(x);
+            onConfirm: (time) => dateTime = time);
+        print(dateTime.toIso8601String());
+        if (dateTime != null) orderData.setDate(dateTime);
       },
     );
   }
 
-  Widget _merchantDetailsSection(ClientOrderData orderData) {
+  Widget _merchantDetailsSection(ClientCreateOrderData orderData) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
       child: Column(
@@ -95,9 +93,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
           ),
           ListTile(
             onTap: () {
-              Provider.of<ClientMerchantData>(context)
-                  .setMerchant(merchant: orderData.merchant);
-              Navigator.pushNamed(context, kMerchantDetailScreenRoute);
+              Navigator.pop(context);
             },
             leading: CachedNetworkImage(
               imageUrl: orderData.merchant.imageUrl,
@@ -112,6 +108,11 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
             isThreeLine: true,
           ),
           ListTile(
+            onTap: () async {
+              String msg = await GoogleMapAPI.openMap(
+                  coordinate: orderData.merchant.locationCoordinate);
+              if (msg != null) Fluttertoast.showToast(msg: msg);
+            },
             title: Text(
               "Address",
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -128,7 +129,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     );
   }
 
-  Widget _paymentDetailsSection(ClientOrderData orderData) {
+  Widget _paymentDetailsSection(ClientCreateOrderData orderData) {
     return Card(
       margin: EdgeInsets.symmetric(
         horizontal: 8.0,
@@ -150,7 +151,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
           Divider(),
           TitleAndSubtitleRowText(
             title: "Grand Total",
-            description: orderData.getGrandTotal(),
+            description: orderData.getGrandTotalString(),
             fontSize: 20,
             titleColor: Colors.blueGrey,
             descriptionColor: Colors.blue,
@@ -194,7 +195,10 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     );
   }
 
-  Widget _confirmButtonSection() {
+  Widget _confirmButtonSection(ClientCreateOrderData orderData) {
+    if (orderData.isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
     return Container(
       color: Colors.green,
       padding: EdgeInsets.all(8.0),
@@ -205,8 +209,16 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
       width: double.infinity,
       alignment: Alignment.center,
       child: InkWell(
-          onTap: () {
-            Fluttertoast.showToast(msg: "Order Pressed");
+          onTap: () async {
+            orderData.setLoading(true);
+            String msg = await orderData.submitOrder();
+            await Future.delayed(Duration(seconds: 2));
+            orderData.setLoading(false);
+            if (msg != null) {
+              Fluttertoast.showToast(msg: msg);
+              return;
+            }
+            Fluttertoast.showToast(msg: "Order Created!");
             Navigator.pop(context);
           },
           child: Text(
@@ -220,7 +232,10 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     );
   }
 
-  Widget _cancelButtonSection(ClientOrderData orderData) {
+  Widget _cancelButtonSection(ClientCreateOrderData orderData) {
+    if (orderData.isLoading) {
+      return SizedBox();
+    }
     return Container(
       color: Colors.red,
       padding: EdgeInsets.all(8.0),
@@ -249,7 +264,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ClientOrderData>(
+    return Consumer<ClientCreateOrderData>(
       builder: (context, orderData, child) {
         return Scaffold(
           appBar: AppBar(
@@ -263,8 +278,8 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                 _timeSection(orderData),
                 _merchantDetailsSection(orderData),
                 _paymentDetailsSection(orderData),
-                _downPaymentSection(),
-                _confirmButtonSection(),
+//                _downPaymentSection(),
+                _confirmButtonSection(orderData),
                 _cancelButtonSection(orderData),
               ],
             ),
