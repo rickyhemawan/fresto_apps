@@ -1,21 +1,25 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:fresto_apps/apis/google_map_api.dart';
 import 'package:fresto_apps/components/food_card.dart';
 import 'package:fresto_apps/components/schedule_card.dart';
 import 'package:fresto_apps/components/title_and_subtitle_row_text.dart';
+import 'package:fresto_apps/models/order.dart';
+import 'package:fresto_apps/models_data/client_data/client_update_order_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
+import 'package:provider/provider.dart';
 
 class OrderScreen extends StatelessWidget {
   final _payHalf = "Pay Half";
   final _payFull = "Pay Full";
   final _picked = "Pay Half";
 
-  Widget _foodList() {
+  Widget _foodList(ClientUpdateOrderData orderData) {
     return ListView.builder(
       itemBuilder: (context, index) {
-        return FoodCardWithQuantity();
+        return FoodCardWithQuantity(menuHelper: orderData.order.menus[index]);
       },
       itemCount: 1,
       shrinkWrap: true,
@@ -23,30 +27,39 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
-  Widget _timeSection() {
+  Widget _orderStatusSection(ClientUpdateOrderData orderData) {
     return InformationCard(
-      color: Colors.blue,
-      title: 'Reservation Date',
-      content: '31 December 2019 at 7:00 PM',
+      color: Colors.green,
+      icon: Icons.access_time,
+      title: 'Order Status',
+      content: orderData.order.formattedOrderStatus,
       showViewIcon: false,
-      onPressed: () {
-        Fluttertoast.showToast(msg: 'Cannot Change Date Once being ordered');
-      },
     );
   }
 
-  Widget _merchantDetailsSection(BuildContext context) {
+  Widget _timeSection(ClientUpdateOrderData orderData) {
+    return InformationCard(
+      color: Colors.blue,
+      title: 'Reservation Date',
+      content: orderData.order.formattedTime,
+      onPressed: () =>
+          Fluttertoast.showToast(msg: "Cannot edit date once being submitted"),
+    );
+  }
+
+  Widget _merchantDetailsSection(
+      BuildContext context, ClientUpdateOrderData orderData) {
     return Column(
       children: <Widget>[
         ListTile(
           onTap: () => Navigator.pushNamed(context, kMerchantDetailScreenRoute),
           leading: CachedNetworkImage(
-            imageUrl: kDummyMerchantImage,
+            imageUrl: orderData.merchant.imageUrl ?? kDummyMerchantImage,
             fit: BoxFit.fill,
           ),
-          title: Text(kDummyMerchantName),
+          title: Text(orderData.merchant.merchantName),
           subtitle: Text(
-            kDummyDescription,
+            orderData.merchant.merchantName,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
@@ -57,17 +70,20 @@ class OrderScreen extends StatelessWidget {
             "Address",
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          subtitle: Text(kDummyMerchantAddress),
+          subtitle: Text(orderData.merchant.locationName),
           trailing: Icon(
             Icons.location_on,
             color: Colors.orange,
+          ),
+          onTap: () async => await GoogleMapAPI.openMap(
+            coordinate: orderData.merchant.locationCoordinate,
           ),
         ),
       ],
     );
   }
 
-  Widget _paymentDetailsSection() {
+  Widget _paymentDetailsSection(ClientUpdateOrderData orderData) {
     return Card(
       margin: EdgeInsets.symmetric(
         horizontal: 8.0,
@@ -75,21 +91,21 @@ class OrderScreen extends StatelessWidget {
       ),
       child: Column(
         children: <Widget>[
-          _foodList(),
+          _foodList(orderData),
           TitleAndSubtitleRowText(
             title: "Product Total",
-            description: "Rp 400000.0",
+            description: orderData.getProductTotal(),
             fontSize: 16.0,
           ),
           TitleAndSubtitleRowText(
             title: "Product Tax",
-            description: "Rp 40000.0",
+            description: orderData.getTax(),
             fontSize: 16.0,
           ),
           Divider(),
           TitleAndSubtitleRowText(
             title: "Grand Total",
-            description: "Rp 440000.0",
+            description: orderData.getGrandTotalString(),
             fontSize: 20,
             titleColor: Colors.blueGrey,
             descriptionColor: Colors.blue,
@@ -99,7 +115,9 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
-  Widget _paymentMethodSection() {
+  Widget _paymentMethodSection(ClientUpdateOrderData orderData) {
+    if (orderData.order.lastOrderStatus ==
+        OrderStatus.kWaitingMerchantConfirmation) return SizedBox();
     return InformationCard(
       icon: Icons.attach_money,
       color: Colors.green,
@@ -112,7 +130,9 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
-  Widget _downPaymentSection() {
+  Widget _downPaymentSection(ClientUpdateOrderData orderData) {
+    if (orderData.order.lastOrderStatus ==
+        OrderStatus.kWaitingMerchantConfirmation) return SizedBox();
     final List<String> _downPaymentList = [
       _payHalf,
       _payFull,
@@ -147,9 +167,10 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
-  Widget _confirmButtonSection(context) {
+  Widget _cancelButtonSection(
+      BuildContext context, ClientUpdateOrderData orderData) {
     return Container(
-      color: Colors.red,
+      color: orderData.order.isEligibleToCancel ? Colors.red : Colors.blueGrey,
       padding: EdgeInsets.all(8.0),
       margin: EdgeInsets.symmetric(
         vertical: 4.0,
@@ -158,7 +179,13 @@ class OrderScreen extends StatelessWidget {
       width: double.infinity,
       alignment: Alignment.center,
       child: InkWell(
-          onTap: () => Navigator.pop(context),
+          onTap: () {
+            if (!orderData.order.isEligibleToCancel) {
+              Fluttertoast.showToast(msg: "Cannot Cancel Order");
+              return;
+            }
+            _onLoading(context);
+          },
           child: Text(
             "Cancel Reservation",
             style: TextStyle(
@@ -181,28 +208,58 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
+  void _onLoading(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0.0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Center(
+                child: CircularProgressIndicator(backgroundColor: Colors.green),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+    new Future.delayed(new Duration(seconds: 3), () {
+      Navigator.pop(context);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Reservation Details'),
-      ),
-      body: Container(
-        child: ListView(
-          shrinkWrap: true,
-          scrollDirection: Axis.vertical,
-          children: <Widget>[
-            _timeSection(),
-            _paymentMethodSection(),
-            _sectionTitle(context, "Restaurant Details"),
-            _merchantDetailsSection(context),
-            _sectionTitle(context, "Product Details"),
-            _paymentDetailsSection(),
-            _downPaymentSection(),
-            _confirmButtonSection(context),
-          ],
-        ),
-      ),
+    return Consumer<ClientUpdateOrderData>(
+      builder: (context, orderData, child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('Reservation Details'),
+          ),
+          body: Container(
+            child: ListView(
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+              children: <Widget>[
+                _orderStatusSection(orderData),
+                _timeSection(orderData),
+                _paymentMethodSection(orderData),
+                _sectionTitle(context, "Restaurant Details"),
+                _merchantDetailsSection(context, orderData),
+                _sectionTitle(context, "Product Details"),
+                _paymentDetailsSection(orderData),
+                _downPaymentSection(orderData),
+                _cancelButtonSection(context, orderData),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

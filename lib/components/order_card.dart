@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:fresto_apps/components/text_and_image_progress_animation.dart';
 import 'package:fresto_apps/models/merchant.dart';
 import 'package:fresto_apps/models/order.dart';
+import 'package:fresto_apps/models_data/client_data/client_update_order_data.dart';
 import 'package:fresto_apps/screens/merchant_screens/merchant_order_details_screen.dart';
 import 'package:fresto_apps/utils/constants.dart';
+import 'package:provider/provider.dart';
 
 class LoadingOrderCard extends StatelessWidget {
   @override
@@ -61,7 +63,13 @@ class OrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => Navigator.pushNamed(context, kOrderScreenRoute),
+      onTap: () {
+        Provider.of<ClientUpdateOrderData>(context).setOrderData(
+          merchant: this.merchant,
+          order: this.order,
+        );
+        Navigator.pushNamed(context, kOrderScreenRoute);
+      },
       child: Card(
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),

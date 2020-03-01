@@ -84,6 +84,23 @@ class Order {
     return dateFormat.format(this.orderDate);
   }
 
+  bool get isEligibleToCancel {
+    return lastOrderStatus == OrderStatus.kWaitingMerchantConfirmation ||
+        lastOrderStatus == OrderStatus.kWaitingPayment;
+  }
+
+  String get formattedOrderStatus {
+    if (lastOrderStatus == OrderStatus.kWaitingMerchantConfirmation)
+      return "Waiting restaurant approval";
+    if (lastOrderStatus == OrderStatus.kWaitingPayment)
+      return "Waiting Down Payment";
+    if (lastOrderStatus == OrderStatus.kCancelled) return "Order is Cancelled";
+    if (lastOrderStatus == OrderStatus.kDone)
+      return "Order is finished, Thank You";
+    if (lastOrderStatus == OrderStatus.kOnProgress) return "On progress";
+    return "No Status";
+  }
+
   @override
   String toString() {
     return 'Order{orderUid: $orderUid, merchantUid: $merchantUid, userUid: $userUid, menus: $menus, orderStatus: $orderStatus, paymentStatus: $paymentStatus, total: $total, orderDate: $orderDate}';
