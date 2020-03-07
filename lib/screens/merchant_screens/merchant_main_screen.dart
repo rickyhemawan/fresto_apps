@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fresto_apps/components/bottom_navigation_icon.dart';
 import 'package:fresto_apps/models_data/merchant_data/merchant_data.dart';
+import 'package:fresto_apps/models_data/merchant_data/merchant_order_timeline_data.dart';
 import 'package:fresto_apps/screens/merchant_screens/merchant_menu_list_screen.dart';
-import 'package:fresto_apps/screens/merchant_screens/merchant_order_list_screen.dart';
+import 'package:fresto_apps/screens/merchant_screens/merchant_order_timeline_screen.dart';
 import 'package:fresto_apps/screens/merchant_screens/merchant_profile_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -23,7 +24,7 @@ class _MerchantMainScreenState extends State<MerchantMainScreen>
   void _onTabTapped(int index) => setState(() => _page = index);
 
   final List<Widget> _bodyList = [
-    MerchantOrderListScreen(key: PageStorageKey("MerchantPage0")),
+    MerchantOrderTimelineScreen(key: PageStorageKey("MerchantPage0")),
     MerchantMenuListScreen(key: PageStorageKey("MerchantPage1")),
     MerchantProfileScreen(key: PageStorageKey("MerchantPage2")),
   ];
@@ -57,5 +58,6 @@ class _MerchantMainScreenState extends State<MerchantMainScreen>
   @override
   void afterFirstLayout(BuildContext context) {
     Provider.of<MerchantData>(context).loadCurrentMerchantData();
+    Provider.of<MerchantOrderTimelineData>(context).updateMerchantUid();
   }
 }

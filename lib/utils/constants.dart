@@ -15,7 +15,6 @@ const kLoginScreenRoute = "/login_screen";
 
 // Merchant Route
 const kMerchantMainScreenRoute = "/merchant_main_screen_route";
-const kMerchantOrderDetailsScreenRoute = "/merchant_order_details_screen_route";
 const kMerchantAddSingleMenuScreenRoute =
     "/merchant_add_single_menu_screen_route";
 const kMerchantEditSingleMenuScreenRoute =
@@ -101,6 +100,9 @@ enum UserType {
   merchant,
   client,
 }
+
+const kPayHalf = "Pay Half";
+const kPayFull = "Pay Full";
 
 // Dummy
 const kDummyCustomerName = "John Doe";

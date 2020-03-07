@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fresto_apps/apis/auth_api.dart';
 import 'package:fresto_apps/apis/merchant_api.dart';
 import 'package:fresto_apps/apis/order_api.dart';
 import 'package:fresto_apps/components/order_card.dart';
@@ -21,6 +21,13 @@ class ClientOrderTimelineData extends ChangeNotifier {
         if (!snapshot.hasData) return SizedBox();
         List<DocumentSnapshot> documents = snapshot.data.documents;
         List<Order> orders = ordersFromSnapshots(documents);
+        orders.sort((o1, o2) {
+          int diff = o1.orderDayPoint - o2.orderDayPoint;
+          if (diff != 0) return diff;
+          if (o1.orderDate.isAfter(o2.orderDate)) return 1;
+          if (o1.orderDate.isBefore(o2.orderDate)) return -1;
+          return 0;
+        });
         print(documents);
         if (snapshot.hasData && this.merchants == null) {
           getMerchantsFromDatabase();
@@ -51,7 +58,8 @@ class ClientOrderTimelineData extends ChangeNotifier {
   }
 
   Merchant findMerchantByUid(String uid) {
-    return merchants.firstWhere((merchant) => merchant.userUid == uid);
+    return merchants.firstWhere((merchant) => merchant.userUid == uid,
+        orElse: () => Merchant());
   }
 
   List<Order> ordersFromSnapshots(List<DocumentSnapshot> documents) {
@@ -64,9 +72,7 @@ class ClientOrderTimelineData extends ChangeNotifier {
   }
 
   void updateUserUid() async {
-    await FirebaseAuth.instance
-        .currentUser()
-        .then((user) => this.userUid = user.uid);
+    this.userUid = await AuthAPI.getCurrentUserUid();
     notifyListeners();
   }
 

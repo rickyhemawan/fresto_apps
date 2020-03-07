@@ -6,17 +6,13 @@ import 'package:fresto_apps/components/food_card.dart';
 import 'package:fresto_apps/components/schedule_card.dart';
 import 'package:fresto_apps/components/title_and_subtitle_row_text.dart';
 import 'package:fresto_apps/models/order.dart';
-import 'package:fresto_apps/models_data/client_data/client_update_order_data.dart';
+import 'package:fresto_apps/models_data/update_order_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
 import 'package:provider/provider.dart';
 
 class OrderScreen extends StatelessWidget {
-  final _payHalf = "Pay Half";
-  final _payFull = "Pay Full";
-  final _picked = "Pay Half";
-
-  Widget _foodList(ClientUpdateOrderData orderData) {
+  Widget _foodList(UpdateOrderData orderData) {
     return ListView.builder(
       itemBuilder: (context, index) {
         return FoodCardWithQuantity(menuHelper: orderData.order.menus[index]);
@@ -27,7 +23,7 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
-  Widget _orderStatusSection(ClientUpdateOrderData orderData) {
+  Widget _orderStatusSection(UpdateOrderData orderData) {
     return InformationCard(
       color: Colors.green,
       icon: Icons.access_time,
@@ -37,7 +33,10 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
-  Widget _timeSection(ClientUpdateOrderData orderData) {
+  Widget _timeSection(UpdateOrderData orderData) {
+    if (orderData.lastOrderStatus == OrderStatus.kCancelled) return SizedBox();
+    if (orderData.lastOrderStatus == OrderStatus.kWaitingPayment &&
+        orderData.isAccessedByMerchant) return SizedBox();
     return InformationCard(
       color: Colors.blue,
       title: 'Reservation Date',
@@ -48,7 +47,8 @@ class OrderScreen extends StatelessWidget {
   }
 
   Widget _merchantDetailsSection(
-      BuildContext context, ClientUpdateOrderData orderData) {
+      BuildContext context, UpdateOrderData orderData) {
+    if (orderData.isAccessedByMerchant) return SizedBox();
     return Column(
       children: <Widget>[
         ListTile(
@@ -83,7 +83,7 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
-  Widget _paymentDetailsSection(ClientUpdateOrderData orderData) {
+  Widget _paymentDetailsSection(UpdateOrderData orderData) {
     return Card(
       margin: EdgeInsets.symmetric(
         horizontal: 8.0,
@@ -115,9 +115,14 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
-  Widget _paymentMethodSection(ClientUpdateOrderData orderData) {
-    if (orderData.order.lastOrderStatus ==
-        OrderStatus.kWaitingMerchantConfirmation) return SizedBox();
+  Widget _paymentMethodSection(UpdateOrderData orderData) {
+    if (orderData.lastOrderStatus == OrderStatus.kWaitingMerchantConfirmation)
+      return SizedBox();
+    if (orderData.lastOrderStatus == OrderStatus.kCancelled) return SizedBox();
+    if (orderData.lastOrderStatus == OrderStatus.kWaitingPayment)
+      return SizedBox();
+
+    // Todo Update this when payment gateway available
     return InformationCard(
       icon: Icons.attach_money,
       color: Colors.green,
@@ -130,12 +135,16 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
-  Widget _downPaymentSection(ClientUpdateOrderData orderData) {
-    if (orderData.order.lastOrderStatus ==
-        OrderStatus.kWaitingMerchantConfirmation) return SizedBox();
+  Widget _downPaymentSection(UpdateOrderData orderData) {
+    if (orderData.lastOrderStatus == OrderStatus.kWaitingMerchantConfirmation)
+      return SizedBox();
+    if (orderData.lastOrderStatus == OrderStatus.kCancelled) return SizedBox();
+    if (orderData.lastOrderStatus == OrderStatus.kWaitingPayment &&
+        orderData.isAccessedByMerchant) return SizedBox();
+
     final List<String> _downPaymentList = [
-      _payHalf,
-      _payFull,
+      kPayHalf,
+      kPayFull,
     ];
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 8.0),
@@ -155,9 +164,12 @@ class OrderScreen extends StatelessWidget {
           ),
           RadioButtonGroup(
             labels: _downPaymentList,
-            picked: _picked,
-            disabled: _downPaymentList,
+            picked: orderData.getSubmittedDownPayment(),
+            disabled: orderData.lastOrderStatus == OrderStatus.kWaitingPayment
+                ? null
+                : _downPaymentList,
             activeColor: Colors.green,
+            onSelected: orderData.onDownPaymentSelected,
             labelStyle: TextStyle(
               fontWeight: FontWeight.bold,
             ),
@@ -167,10 +179,19 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
-  Widget _cancelButtonSection(
-      BuildContext context, ClientUpdateOrderData orderData) {
+  Widget _buttonBuilder(
+      {void Function() onTap, String labelTitle, Color color}) {
+    Text labelText = Text(
+      labelTitle,
+      style: TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+        fontSize: 20.0,
+      ),
+    );
+
     return Container(
-      color: orderData.order.isEligibleToCancel ? Colors.red : Colors.blueGrey,
+      color: color,
       padding: EdgeInsets.all(8.0),
       margin: EdgeInsets.symmetric(
         vertical: 4.0,
@@ -179,26 +200,117 @@ class OrderScreen extends StatelessWidget {
       width: double.infinity,
       alignment: Alignment.center,
       child: InkWell(
-          onTap: () {
-            if (!orderData.order.isEligibleToCancel) {
-              Fluttertoast.showToast(msg: "Cannot Cancel Order");
-              return;
-            }
-            _onLoading(context);
-          },
-          child: Text(
-            "Cancel Reservation",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 20.0,
-            ),
-          )),
+        onTap: onTap,
+        child: labelText,
+      ),
+    );
+  }
+
+  Widget _completeReservationButton(
+      BuildContext context, UpdateOrderData orderData) {
+    // Validation
+    if (!orderData.isAccessedByMerchant) return SizedBox();
+    if (orderData.lastOrderStatus != OrderStatus.kOnProgress) return SizedBox();
+
+    // On Button Pressed Callback
+    void onTap() {
+      if (!orderData.order.isEligibleToComplete) {
+        Fluttertoast.showToast(
+            msg: "Cannot Complete Order Before Reservation Time");
+        return;
+      }
+      _onLoading(
+        context: context,
+        orderData: orderData,
+        onProcessCallback: orderData.finishReservation,
+      );
+    }
+
+    // Button views
+    return _buttonBuilder(
+      onTap: onTap,
+      color:
+          orderData.order.isEligibleToComplete ? Colors.green : Colors.blueGrey,
+      labelTitle: "Complete Reservation",
+    );
+  }
+
+  Widget _payReservationButtonSection(
+      BuildContext context, UpdateOrderData orderData) {
+    // Validation
+    if (orderData.lastOrderStatus != OrderStatus.kWaitingPayment)
+      return SizedBox();
+
+    // On Button Pressed Callback
+    void onTap() {
+      _onLoading(
+        context: context,
+        orderData: orderData,
+        onProcessCallback: orderData.payReservation,
+      );
+    }
+
+    // Button views
+    return _buttonBuilder(
+      onTap: onTap,
+      color: Colors.green,
+      labelTitle: "Pay Reservation",
+    );
+  }
+
+  Widget _approveButtonSection(
+      BuildContext context, UpdateOrderData orderData) {
+    // Validation
+    if (!orderData.isAccessedByMerchant) return SizedBox();
+    if (orderData.lastOrderStatus != OrderStatus.kWaitingMerchantConfirmation)
+      return SizedBox();
+
+    // On Button Pressed Callback
+    void onTap() {
+      _onLoading(
+        context: context,
+        orderData: orderData,
+        onProcessCallback: orderData.approveReservation,
+      );
+    }
+
+    // Button views
+    return _buttonBuilder(
+      onTap: onTap,
+      color: Colors.green,
+      labelTitle: "Approve Reservation",
+    );
+  }
+
+  Widget _cancelButtonSection(BuildContext context, UpdateOrderData orderData) {
+    // Validation
+    if (orderData.isAccessedByMerchant) return SizedBox();
+    if (orderData.lastOrderStatus == OrderStatus.kCancelled) return SizedBox();
+
+    // On Button Pressed Callback
+    void onTap() {
+      if (!orderData.order.isEligibleToCancel) {
+        Fluttertoast.showToast(msg: "Cannot Cancel Order");
+        return;
+      }
+      _onLoading(
+        context: context,
+        orderData: orderData,
+        onProcessCallback: orderData.cancelReservation,
+      );
+    }
+
+    // Button views
+    return _buttonBuilder(
+      onTap: onTap,
+      color: orderData.order.isEligibleToCancel ? Colors.red : Colors.blueGrey,
+      labelTitle: "Cancel Reservation",
     );
   }
 
   Widget _sectionTitle(BuildContext context, String title,
-      {EdgeInsetsGeometry margin}) {
+      {EdgeInsetsGeometry margin, bool setVisibility = true}) {
+    if (!setVisibility) return SizedBox();
     return Container(
       margin: margin ?? EdgeInsets.fromLTRB(16.0, 16.0, 8.0, 4.0),
       child: Text(
@@ -208,7 +320,11 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
-  void _onLoading(BuildContext context) {
+  void _onLoading({
+    @required BuildContext context,
+    @required UpdateOrderData orderData,
+    Future<String> Function() onProcessCallback,
+  }) async {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -228,14 +344,22 @@ class OrderScreen extends StatelessWidget {
         );
       },
     );
-    new Future.delayed(new Duration(seconds: 3), () {
+    String result;
+    if (onProcessCallback != null) result = await onProcessCallback();
+    Navigator.pop(context);
+    if (result != null)
+      Fluttertoast.showToast(msg: result);
+    else {
+      Fluttertoast.showToast(msg: "Reservation Updated!");
       Navigator.pop(context);
-    });
+    }
   }
+
+  Widget _divider() => SizedBox(height: 12.0);
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ClientUpdateOrderData>(
+    return Consumer<UpdateOrderData>(
       builder: (context, orderData, child) {
         return Scaffold(
           appBar: AppBar(
@@ -249,12 +373,18 @@ class OrderScreen extends StatelessWidget {
                 _orderStatusSection(orderData),
                 _timeSection(orderData),
                 _paymentMethodSection(orderData),
-                _sectionTitle(context, "Restaurant Details"),
+                _sectionTitle(context, "Restaurant Details",
+                    setVisibility: !orderData.isAccessedByMerchant),
                 _merchantDetailsSection(context, orderData),
                 _sectionTitle(context, "Product Details"),
                 _paymentDetailsSection(orderData),
                 _downPaymentSection(orderData),
+                _divider(),
+                _completeReservationButton(context, orderData),
+                _payReservationButtonSection(context, orderData),
+                _approveButtonSection(context, orderData),
                 _cancelButtonSection(context, orderData),
+                _divider(),
               ],
             ),
           ),

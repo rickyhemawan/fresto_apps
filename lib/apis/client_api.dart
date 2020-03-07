@@ -24,4 +24,15 @@ class ClientAPI {
     });
     return client;
   }
+
+  static Future<List<Client>> getClientsFromDatabase() async {
+    List<Client> clients = [];
+    await Firestore.instance
+        .collection(kClientCollection)
+        .getDocuments()
+        .then((QuerySnapshot qs) {
+      qs.documents.forEach((d) => clients.add(Client.fromJson(d.data)));
+    });
+    return clients;
+  }
 }

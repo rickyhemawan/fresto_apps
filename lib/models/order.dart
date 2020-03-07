@@ -1,4 +1,5 @@
 import 'package:fresto_apps/models/helper/menu_helper.dart';
+import 'package:fresto_apps/utils/constants.dart';
 import 'package:intl/intl.dart';
 
 class OrderStatus {
@@ -46,7 +47,7 @@ class Order {
         "userUid": this.userUid,
         "menus": encodeMenusToJson(this.menus),
         "orderStatus": this.orderStatus,
-        "paymentStatus": paymentStatus,
+        "paymentStatus": this.paymentStatus,
         "total": this.total,
         "orderDate": this.orderDate.toIso8601String(),
         "paymentUid": this.paymentUid,
@@ -89,6 +90,10 @@ class Order {
         lastOrderStatus == OrderStatus.kWaitingPayment;
   }
 
+  bool get isEligibleToComplete {
+    return this.orderDate.isBefore(DateTime.now());
+  }
+
   String get formattedOrderStatus {
     if (lastOrderStatus == OrderStatus.kWaitingMerchantConfirmation)
       return "Waiting restaurant approval";
@@ -99,6 +104,40 @@ class Order {
       return "Order is finished, Thank You";
     if (lastOrderStatus == OrderStatus.kOnProgress) return "On progress";
     return "No Status";
+  }
+
+  String get formattedPaymentStatus {
+    if (paymentStatus == PaymentStatus.kNotPaid) return "Not Paid";
+    if (paymentStatus == PaymentStatus.kPaidHalf) return "Paid Half";
+    if (paymentStatus == PaymentStatus.kPaidFull) return "Paid Fully";
+    return "No Status";
+  }
+
+  OrderDay get orderDay {
+    if (this.orderDate == null) return null;
+    if (this.lastOrderStatus == OrderStatus.kDone) return OrderDay.past;
+    if (this.lastOrderStatus == OrderStatus.kCancelled) return OrderDay.past;
+    final DateTime todayDate = DateTime.now();
+    Duration difference = this.orderDate.difference(todayDate);
+
+    if (todayDate.isAfter(this.orderDate)) return OrderDay.past;
+    if (difference < Duration(hours: 24)) return OrderDay.today;
+    return OrderDay.upcoming;
+  }
+
+  int get orderDayPoint {
+    switch (orderDay) {
+      case OrderDay.today:
+        return 1;
+        break;
+      case OrderDay.upcoming:
+        return 2;
+        break;
+      case OrderDay.past:
+        return 3;
+        break;
+    }
+    return 0;
   }
 
   @override

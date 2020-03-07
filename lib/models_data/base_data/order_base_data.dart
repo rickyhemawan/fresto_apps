@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:fresto_apps/models/client.dart';
 import 'package:fresto_apps/models/helper/menu_helper.dart';
 import 'package:fresto_apps/models/menu.dart';
 import 'package:fresto_apps/models/merchant.dart';
@@ -7,6 +8,7 @@ import 'package:fresto_apps/models/order.dart';
 abstract class OrderBaseData extends ChangeNotifier {
   Order order;
   Merchant merchant;
+  Client client;
 
   DateTime minimumDate;
   DateTime maximumDate;
@@ -50,9 +52,16 @@ abstract class OrderBaseData extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setOrderData({Merchant merchant, Order order}) {
+  void setClient(Client client) {
+    createOrderInstance();
+    this.client = client;
+    notifyListeners();
+  }
+
+  void setOrderData({Merchant merchant, Order order, Client client}) {
     if (merchant != null) setMerchant(merchant);
     if (order != null) setOrder(order);
+    if (client != null) setClient(client);
   }
 
   void setDateBasedOnMerchant(Merchant merchant) {

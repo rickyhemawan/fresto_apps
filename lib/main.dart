@@ -5,11 +5,12 @@ import 'package:fresto_apps/models_data/client_data/client_create_order_data.dar
 import 'package:fresto_apps/models_data/client_data/client_data.dart';
 import 'package:fresto_apps/models_data/client_data/client_merchant_data.dart';
 import 'package:fresto_apps/models_data/client_data/client_order_timeline_data.dart';
-import 'package:fresto_apps/models_data/client_data/client_update_order_data.dart';
 import 'package:fresto_apps/models_data/maps_data/map_search_data.dart';
 import 'package:fresto_apps/models_data/merchant_data/merchant_data.dart';
 import 'package:fresto_apps/models_data/merchant_data/merchant_modify_menu_data.dart';
+import 'package:fresto_apps/models_data/merchant_data/merchant_order_timeline_data.dart';
 import 'package:fresto_apps/models_data/merchants_data.dart';
+import 'package:fresto_apps/models_data/update_order_data.dart';
 import 'package:fresto_apps/models_data/user_auth_data.dart';
 import 'package:fresto_apps/screens/admin_screens/admin_add_merchant_screen.dart';
 import 'package:fresto_apps/screens/admin_screens/admin_main_screen.dart';
@@ -23,7 +24,6 @@ import 'package:fresto_apps/screens/merchant_detail_screen.dart';
 import 'package:fresto_apps/screens/merchant_screens/merchant_add_single_menu_screen.dart';
 import 'package:fresto_apps/screens/merchant_screens/merchant_edit_single_menu_screen.dart';
 import 'package:fresto_apps/screens/merchant_screens/merchant_main_screen.dart';
-import 'package:fresto_apps/screens/merchant_screens/merchant_order_details_screen.dart';
 import 'package:fresto_apps/screens/merchant_screens/merchant_track_client_screen.dart';
 import 'package:fresto_apps/screens/order_screen.dart';
 import 'package:fresto_apps/screens/splash_screen.dart';
@@ -47,12 +47,14 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(builder: (context) => ClientData()),
         ChangeNotifierProvider(builder: (context) => ClientMerchantData()),
         ChangeNotifierProvider(builder: (context) => ClientCreateOrderData()),
-        ChangeNotifierProvider(builder: (context) => ClientUpdateOrderData()),
         ChangeNotifierProvider(builder: (context) => ClientOrderTimelineData()),
         ChangeNotifierProvider(builder: (context) => MerchantsData()),
         ChangeNotifierProvider(builder: (context) => MapSearchData()),
         ChangeNotifierProvider(builder: (context) => MerchantData()),
-        ChangeNotifierProvider(builder: (context) => MerchantModifyMenuData())
+        ChangeNotifierProvider(builder: (context) => MerchantModifyMenuData()),
+        ChangeNotifierProvider(
+            builder: (context) => MerchantOrderTimelineData()),
+        ChangeNotifierProvider(builder: (context) => UpdateOrderData()),
       ],
       child: MaterialApp(
         title: 'Fresto',
@@ -71,8 +73,6 @@ class MyApp extends StatelessWidget {
           kOrderScreenRoute: (context) => OrderScreen(),
           // Merchant
           kMerchantMainScreenRoute: (context) => MerchantMainScreen(),
-          kMerchantOrderDetailsScreenRoute: (context) =>
-              MerchantOrderDetailsScreen(),
           kMerchantAddSingleMenuScreenRoute: (context) =>
               MerchantAddSingleMenuScreen(),
           kMerchantEditSingleMenuScreenRoute: (context) =>

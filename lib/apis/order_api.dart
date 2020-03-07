@@ -16,6 +16,8 @@ class OrderAPI {
 
     String uid = Uuid().v4().toString();
     order.orderUid = uid;
+    if (order.paymentStatus == null)
+      order.paymentStatus = PaymentStatus.kNotPaid;
 
     try {
       await Firestore.instance
@@ -43,6 +45,54 @@ class OrderAPI {
           .where("userUid", isEqualTo: clientUid)
           .snapshots();
     }
+    return null;
+  }
+
+  static Future<String> updatePaymentStatus(
+      {@required String status, @required Order order}) async {
+    if (status == null) return "Payment Status must not be empty";
+    if (order == null) return "Order must not be empty";
+    // Creating Query for firebase
+    Map<String, dynamic> requestBody = {
+      "paymentStatus": status,
+    };
+    try {
+      await Firestore.instance
+          .collection(kOrderCollection)
+          .document(order.orderUid)
+          .updateData(requestBody);
+    } catch (e) {
+      print(e);
+      return "Error updating payment status";
+    }
+    return null;
+  }
+
+  static Future<String> updateOrderStatus(
+      {@required String status, @required Order order}) async {
+    if (status == null) return "Order Status must not be empty";
+    if (order == null) return "Order must not be empty";
+
+    // Creating new updated order status
+    List<String> tempStatus = [];
+    tempStatus.addAll(order.orderStatus);
+    tempStatus.add(status);
+
+    // Creating Query for firebase
+    Map<String, dynamic> requestBody = {
+      "orderStatus": tempStatus,
+    };
+
+    try {
+      await Firestore.instance
+          .collection(kOrderCollection)
+          .document(order.orderUid)
+          .updateData(requestBody);
+    } catch (e) {
+      print(e);
+      return "Error updating status";
+    }
+
     return null;
   }
 }

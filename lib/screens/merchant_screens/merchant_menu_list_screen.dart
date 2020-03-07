@@ -16,8 +16,8 @@ class _MerchantMenuListScreenState extends State<MerchantMenuListScreen> {
   Widget _menuSection(MerchantData merchantData) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
-        (context, index) =>
-            FoodCardWithEdit(menu: merchantData.getMenus()[index]),
+        (context, index) => FoodCardWithEdit(
+            menu: merchantData.getMenus()[index], context: context),
         childCount: merchantData.getMenus().length,
       ),
     );

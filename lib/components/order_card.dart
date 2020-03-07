@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fresto_apps/components/text_and_image_progress_animation.dart';
+import 'package:fresto_apps/models/client.dart';
 import 'package:fresto_apps/models/merchant.dart';
 import 'package:fresto_apps/models/order.dart';
-import 'package:fresto_apps/models_data/client_data/client_update_order_data.dart';
-import 'package:fresto_apps/screens/merchant_screens/merchant_order_details_screen.dart';
+import 'package:fresto_apps/models_data/update_order_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
 import 'package:provider/provider.dart';
 
@@ -62,12 +62,39 @@ class OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color getColor() {
+      switch (this.order.orderDay) {
+        case OrderDay.today:
+          return Colors.green;
+        case OrderDay.upcoming:
+          return Colors.orange;
+        case OrderDay.past:
+          return Colors.grey;
+      }
+      return Colors.black;
+    }
+
+    String getLabel() {
+      switch (this.order.orderDay) {
+        case OrderDay.today:
+          return "Today Reservation";
+        case OrderDay.upcoming:
+          return "Upcoming Reservation";
+        case OrderDay.past:
+          return "Past Reservation";
+      }
+      return null;
+    }
+
     return InkWell(
       onTap: () {
-        Provider.of<ClientUpdateOrderData>(context).setOrderData(
+        Provider.of<UpdateOrderData>(context).setOrderData(
           merchant: this.merchant,
           order: this.order,
         );
+        Provider.of<UpdateOrderData>(context).setAccessedByMerchant(false);
+        Provider.of<UpdateOrderData>(context).setClient(null);
+        Provider.of<UpdateOrderData>(context).onDownPaymentSelected(null);
         Navigator.pushNamed(context, kOrderScreenRoute);
       },
       child: Card(
@@ -108,11 +135,20 @@ class OrderCard extends StatelessWidget {
                       ),
                       maxLines: 1,
                     ),
+                    order.orderDayPoint < 3
+                        ? Text(
+                            "Order Status: ${order.formattedOrderStatus}",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: getColor(),
+                            ),
+                          )
+                        : SizedBox(),
                     Text(
-                      "Upcoming Reservation, ${order.formattedTime}",
+                      "${getLabel()}, ${order.formattedTime}",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.orange,
+                        color: getColor(),
                       ),
                     ),
                     SizedBox(height: 4.0),
@@ -138,14 +174,16 @@ class OrderCard extends StatelessWidget {
 }
 
 class MerchantOrderCard extends StatelessWidget {
-  final OrderDay orderDay;
+  final Order order;
+  final Client client;
+  final Merchant merchant;
 
-  MerchantOrderCard({this.orderDay = OrderDay.today});
+  MerchantOrderCard({this.order, this.client, this.merchant});
 
   @override
   Widget build(BuildContext context) {
     Color textColor;
-    switch (orderDay) {
+    switch (this.order.orderDay) {
       case OrderDay.today:
         textColor = Colors.orange;
         break;
@@ -156,16 +194,16 @@ class MerchantOrderCard extends StatelessWidget {
         textColor = Colors.grey;
         break;
     }
-
     return InkWell(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MerchantOrderDetailsScreen(
-            orderDay: this.orderDay,
-          ),
-        ),
-      ),
+      onTap: () {
+        Provider.of<UpdateOrderData>(context).setOrderData(
+          order: order,
+          merchant: merchant,
+          client: client,
+        );
+        Provider.of<UpdateOrderData>(context).setAccessedByMerchant(true);
+        Navigator.pushNamed(context, kOrderScreenRoute);
+      },
       child: Card(
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
@@ -173,21 +211,28 @@ class MerchantOrderCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                "Customer Name: $kDummyCustomerName",
+                "Order Status: ${order.formattedOrderStatus}",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                 ),
                 maxLines: 1,
               ),
               Text(
-                "31 December 2019 at 7:00 PM",
+                "Customer Name: ${client.fullName}",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+                maxLines: 1,
+              ),
+              Text(
+                order.formattedTime,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: textColor,
                 ),
               ),
               Text(
-                "Total: $kDummyFoodPrice",
+                "Total: Rp ${order.total}",
               ),
               SizedBox(height: 4.0),
               Container(
