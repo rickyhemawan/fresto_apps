@@ -1,20 +1,31 @@
 package id.co.fresto.fresto_apps;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.midtrans.sdk.corekit.callback.TransactionFinishedCallback;
 import com.midtrans.sdk.corekit.core.LocalDataHandler;
 import com.midtrans.sdk.corekit.core.MidtransSDK;
 import com.midtrans.sdk.corekit.core.TransactionRequest;
+import com.midtrans.sdk.corekit.core.UIKitCustomSetting;
+import com.midtrans.sdk.corekit.models.CustomerDetails;
 import com.midtrans.sdk.corekit.models.ItemDetails;
 import com.midtrans.sdk.corekit.models.UserAddress;
 import com.midtrans.sdk.corekit.models.UserDetail;
+import com.midtrans.sdk.corekit.models.snap.MerchantData;
 import com.midtrans.sdk.corekit.models.snap.TransactionResult;
 import com.midtrans.sdk.uikit.SdkUIFlowBuilder;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.flutter.app.FlutterActivity;
+import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugins.GeneratedPluginRegistrant;
 
@@ -27,52 +38,97 @@ public class MainActivity extends FlutterActivity implements TransactionFinished
     GeneratedPluginRegistrant.registerWith(this);
 
     new MethodChannel(getFlutterView(), CHANNEL).setMethodCallHandler((call, result) -> {
-      if(call.method.equals("testInvoke")){
-        result.success("-----Congrats Method Channel Invoked-----");
-      }
-
-      if(call.method.equals("charge")){
-        SdkUIFlowBuilder.init()
-                .setClientKey("SB-Mid-client-bfA7pEzaHB0V1GuA") // client_key is mandatory
-                .setContext(MainActivity.this) // context is mandatory
-                .setTransactionFinishedCallback(this)
-                .setMerchantBaseUrl("https://midtrans-server.herokuapp.com/checkout.php/") //set merchant url (required) BASE_URL
-                .enableLog(true) // enable sdk log (optional)
-                .buildSDK();
-        UserDetail userDetail = LocalDataHandler.readObject("user_details", UserDetail.class);
-        if (userDetail == null) {
-          userDetail = new UserDetail();
-          userDetail.setUserFullName("mamamia");
-          userDetail.setEmail("mama@mia.com");
-          userDetail.setUserId("uid123456");
-
-          ArrayList<UserAddress> userAddresses = new ArrayList<>();
-          UserAddress userAddress = new UserAddress();
-          userAddress.setAddress("Jalan Andalas Gang Sebelah No. 1");
-          userAddress.setCity("Jakarta");
-          userAddress.setAddressType(com.midtrans.sdk.corekit.core.Constants.ADDRESS_TYPE_BOTH);
-          userAddress.setZipcode("12345");
-          userAddress.setCountry("IDN");
-          userAddresses.add(userAddress);
-          userDetail.setUserAddresses(userAddresses);
-          LocalDataHandler.saveObject("user_details", userDetail);
-        }
-        final double amount = 20000;
-        final TransactionRequest transactionRequest = new TransactionRequest("transaction1234", amount);
-        ItemDetails itemDetails = new ItemDetails("IDKU", amount, 1, "Kost");
-
-        ArrayList<ItemDetails> itemDetailsList = new ArrayList<>();
-        itemDetailsList.add(itemDetails);
-
-        MidtransSDK.getInstance().setTransactionRequest(transactionRequest);
-        MidtransSDK.getInstance().startPaymentUiFlow(MainActivity.this);
-        result.success("MIDTRANS DONE!!!");
+      if(call.method.equals("init")) setSdkUIFlow(call, result);
+      else if(call.method.equals("makePayment")){
+        payNow(call,result, MainActivity.this);
+      }else{
+        result.notImplemented();
       }
     });
   }
 
+  private void payNow(MethodCall methodCall, MethodChannel.Result result, Context context){
+    try {
+      String clientString = (String) methodCall.argument("clientStr");
+      String orderString = (String) methodCall.argument("orderStr");
+
+      Log.d(CHANNEL, "payNow: " + clientString);
+      Log.d(CHANNEL, "payNow: " + orderString);
+
+      // Validation
+      if(clientString == null) throw new NullPointerException("clientStr is null");
+      if(orderString == null) throw new NullPointerException("orderStr is null");
+
+      JSONObject clientJson = new JSONObject(clientString);
+      JSONObject orderJson = new JSONObject(orderString);
+
+      TransactionRequest transactionRequest = new TransactionRequest(
+              orderJson.getString("uid"),
+              orderJson.getDouble("total")
+      );
+      // Menus
+      ArrayList<ItemDetails> itemDetails = new ArrayList<>();
+      JSONArray menusJson = orderJson.getJSONArray("menus");
+      for(int i = 0; i < menusJson.length(); i++){
+        JSONObject tempObj = menusJson.getJSONObject(i);
+        ItemDetails item = new ItemDetails();
+        item.setName(tempObj.getString("name"));
+        item.setPrice(tempObj.getDouble("price"));
+        item.setQuantity(tempObj.getInt("quantity"));
+        itemDetails.add(item);
+      }
+
+      double tax = orderJson.getDouble("total") / 11;
+      ItemDetails taxItem = new ItemDetails();
+      taxItem.setName("Tax");
+      taxItem.setPrice(tax);
+      taxItem.setQuantity(1);
+      itemDetails.add(taxItem);
+
+      // Customer
+      CustomerDetails customerDetails = new CustomerDetails();
+      customerDetails.setEmail(clientJson.getString("email"));
+      customerDetails.setFirstName(clientJson.getString("fullName"));
+      customerDetails.setPhone(clientJson.getString("phoneNumber"));
+
+      transactionRequest.setCustomerDetails(customerDetails);
+      transactionRequest.setItemDetails(itemDetails);
+
+      UIKitCustomSetting setting = MidtransSDK.getInstance().getUIKitCustomSetting();
+
+      MidtransSDK.getInstance().setUIKitCustomSetting(setting);
+      MidtransSDK.getInstance().setTransactionRequest(transactionRequest);
+      MidtransSDK.getInstance().startPaymentUiFlow(context);
+      result.success("Payment Invoked");
+    }catch (Exception e){
+      Log.d(CHANNEL, "payNow: " + e.getMessage());
+      result.success(e.getMessage());
+    }
+  }
+
+  private void setSdkUIFlow(MethodCall call, MethodChannel.Result result){
+    SdkUIFlowBuilder.init()
+            .setClientKey((String) call.argument("client_api_key")) // client_key is mandatory
+            .setContext(MainActivity.this) // context is mandatory
+            .setTransactionFinishedCallback(this)
+            .setMerchantBaseUrl((String) call.argument("check_out_url")) //set merchant url (required) BASE_URL
+            .enableLog(true) // enable sdk log (optional)
+            .buildSDK();
+    result.success("Successfully Initialized SDKUIFlowBuilder");
+  }
+
   @Override
   public void onTransactionFinished(TransactionResult transactionResult) {
-
+    Map<String, Object> content = new HashMap<>();
+    content.put("transactionCanceled", transactionResult.isTransactionCanceled());
+    content.put("status", transactionResult.getStatus());
+    content.put("source", transactionResult.getSource());
+    content.put("statusMessage", transactionResult.getStatusMessage());
+    if(transactionResult.getResponse() != null)
+      content.put("response", transactionResult.getResponse().toString());
+    else
+      content.put("response", null);
+    Log.d(CHANNEL, "onTransactionFinished: " + content.toString());
+    new MethodChannel(getFlutterView(), CHANNEL).invokeMethod("onTransactionFinished", content);
   }
 }

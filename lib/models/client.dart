@@ -3,6 +3,7 @@ import 'package:fresto_apps/models/user.dart';
 class Client extends User {
   String fullName;
   String locationCoordinate;
+  bool allowTracking;
 
   Client({
     String email,
@@ -10,6 +11,7 @@ class Client extends User {
     String userUid,
     this.fullName,
     this.locationCoordinate,
+    this.allowTracking = false,
   }) : super(
           userUid: userUid,
           email: email,
@@ -22,6 +24,7 @@ class Client extends User {
     this.phoneNumber = json["phoneNumber"];
     this.fullName = json["fullName"];
     this.locationCoordinate = json["locationCoordinate"];
+    this.allowTracking = json["allowTracking"];
   }
 
   Map<String, dynamic> toJson() => {
@@ -30,5 +33,6 @@ class Client extends User {
         "phoneNumber": this.phoneNumber,
         "fullName": this.fullName,
         "locationCoordinate": this.locationCoordinate,
+        "allowTracking": this.allowTracking,
       };
 }

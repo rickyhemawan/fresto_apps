@@ -44,6 +44,5 @@ class MerchantsData extends ChangeNotifier {
     merchants = await MerchantAPI.getMerchantsFromDatabase();
     isLoading = false;
     notifyListeners();
-    merchants.forEach((f) => print(f.merchantName));
   }
 }

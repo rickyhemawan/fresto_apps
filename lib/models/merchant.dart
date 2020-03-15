@@ -34,7 +34,6 @@ class Merchant extends User {
         );
 
   Merchant.fromJson(Map<String, dynamic> json) {
-    print("DATA TYPE OF MENUS ${json["menus"].runtimeType}");
     this.userUid = json["uid"];
     this.email = json["email"];
     this.phoneNumber = json["phoneNumber"];
@@ -59,7 +58,6 @@ class Merchant extends User {
     List<Menu> tempMenus = [];
     if (dynamics == null) return tempMenus;
     dynamics.forEach((e) {
-      print("decodedFromJson => ${e.toString()}");
       Map<String, dynamic> casted =
           Map.castFrom<dynamic, dynamic, String, dynamic>(e);
       tempMenus.add(Menu.fromJson(casted));

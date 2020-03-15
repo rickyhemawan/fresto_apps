@@ -40,6 +40,10 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 
+  Widget _locationSection() {
+    // TODO enable location or disable location tracking
+  }
+
   Widget _logoutSection() {
     return SliverToBoxAdapter(
       child: Padding(

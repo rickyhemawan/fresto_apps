@@ -217,7 +217,6 @@ class UserAuthData extends ChangeNotifier {
   final String adminPassword = "admin1234";
 
   bool giveDirectAccessToAdmin() {
-    print("Login as = $email $password");
     if (this.email.trim() == adminEmail.trim() &&
         this.password.trim() == adminPassword.trim()) return true;
     return false;

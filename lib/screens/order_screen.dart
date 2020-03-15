@@ -6,6 +6,7 @@ import 'package:fresto_apps/components/food_card.dart';
 import 'package:fresto_apps/components/schedule_card.dart';
 import 'package:fresto_apps/components/title_and_subtitle_row_text.dart';
 import 'package:fresto_apps/models/order.dart';
+import 'package:fresto_apps/models_data/client_data/client_data.dart';
 import 'package:fresto_apps/models_data/update_order_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
@@ -246,7 +247,11 @@ class OrderScreen extends StatelessWidget {
       _onLoading(
         context: context,
         orderData: orderData,
-        onProcessCallback: orderData.payReservation,
+        onProcessCallback: () async {
+          return await orderData.payReservation(
+            client: Provider.of<ClientData>(context).client,
+          );
+        },
       );
     }
 

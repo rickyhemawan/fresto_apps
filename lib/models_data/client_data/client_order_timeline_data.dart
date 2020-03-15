@@ -37,6 +37,7 @@ class ClientOrderTimelineData extends ChangeNotifier {
             child: CircularProgressIndicator(),
           );
         }
+        if (orders.length == 0) return SizedBox();
         return ListView.builder(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
