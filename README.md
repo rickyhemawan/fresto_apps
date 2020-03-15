@@ -9,7 +9,7 @@ MIDTRANS_CHECKOUT_URL=<your-midtrans-server-url-here>/checkout.php/
 ```
 For further information about [Midtrans](https://midtrans.com/) payment gateway please checkout their [online documentation](https://docs.midtrans.com/en/welcome/index.html)
 
-When you execute `get dependencies` you should have a `local.properties` inside the `../fresto_apps/android/` please also add the line of code above for android user.
+When you execute `get dependencies` you should have a `local.properties` inside the `../fresto_apps/android/` please also add the line of code below for android user.
 For example:
 ```javascript
 //other code...
