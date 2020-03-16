@@ -26,6 +26,7 @@ class Order {
   double total;
   DateTime orderDate;
   String paymentUid;
+  String paymentMethod;
 
   Order();
 
@@ -39,6 +40,7 @@ class Order {
     this.total = json["total"];
     this.orderDate = DateTime.parse(json["orderDate"].toString());
     this.paymentUid = json["paymentUid"];
+    this.paymentMethod = json["paymentMethod"];
   }
 
   Map<String, dynamic> toJson() => {
@@ -51,6 +53,7 @@ class Order {
         "total": this.total,
         "orderDate": this.orderDate.toIso8601String(),
         "paymentUid": this.paymentUid,
+        "paymentMethod": this.paymentMethod,
       };
 
   List<MenuHelper> decodeMenusFromJson(List<dynamic> dynamics) {
@@ -124,6 +127,9 @@ class Order {
     if (difference < Duration(hours: 24)) return OrderDay.today;
     return OrderDay.upcoming;
   }
+
+  String get formattedPaymentMethod =>
+      "${this.paymentMethod[0].toUpperCase()}${this.paymentMethod.substring(1)}";
 
   int get orderDayPoint {
     switch (orderDay) {

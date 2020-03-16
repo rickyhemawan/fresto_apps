@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fresto_apps/apis/google_map_api.dart';
@@ -26,6 +27,7 @@ class OrderScreen extends StatelessWidget {
 
   Widget _orderStatusSection(UpdateOrderData orderData) {
     return InformationCard(
+      onPressed: null,
       color: Colors.green,
       icon: Icons.access_time,
       title: 'Order Status',
@@ -122,21 +124,18 @@ class OrderScreen extends StatelessWidget {
     if (orderData.lastOrderStatus == OrderStatus.kCancelled) return SizedBox();
     if (orderData.lastOrderStatus == OrderStatus.kWaitingPayment)
       return SizedBox();
+    if (orderData.order.paymentMethod == null) return SizedBox();
 
-    // Todo Update this when payment gateway available
     return InformationCard(
       icon: Icons.attach_money,
       color: Colors.green,
       title: 'Payment Method',
-      content: 'OVO',
+      content: orderData.order.formattedPaymentMethod,
       showViewIcon: false,
-      onPressed: () {
-        Fluttertoast.showToast(msg: 'Cannot Change Date Once being ordered');
-      },
     );
   }
 
-  Widget _downPaymentSection(UpdateOrderData orderData) {
+  Widget _downPaymentSection(BuildContext context, UpdateOrderData orderData) {
     if (orderData.lastOrderStatus == OrderStatus.kWaitingMerchantConfirmation)
       return SizedBox();
     if (orderData.lastOrderStatus == OrderStatus.kCancelled) return SizedBox();
@@ -147,6 +146,43 @@ class OrderScreen extends StatelessWidget {
       kPayHalf,
       kPayFull,
     ];
+    Widget payWithMidtrans(BuildContext context) {
+      if (orderData.lastOrderStatus != OrderStatus.kWaitingPayment)
+        return SizedBox();
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.lightBlueAccent.withOpacity(0.3),
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(6.0),
+            topLeft: Radius.circular(6.0),
+          ),
+        ),
+        child: ListTile(
+          contentPadding: EdgeInsets.all(4.0),
+          leading: ClipRRect(
+            borderRadius: BorderRadius.circular(15.0),
+            child: Image.asset(
+              "assets/images/midtrans_logo.jpg",
+            ),
+          ),
+          title: Text(
+            "Pay with Midtrans",
+            style: TextStyle(
+              color: Colors.blue,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          trailing: Icon(Icons.navigate_next),
+          onTap: () async {
+            String msg = await orderData.payWithMidTrans(
+              client: Provider.of<ClientData>(context).client,
+            );
+            if (msg != null) Fluttertoast.showToast(msg: msg);
+          },
+        ),
+      );
+    }
+
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 8.0),
       child: Column(
@@ -175,6 +211,7 @@ class OrderScreen extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
+          payWithMidtrans(context),
         ],
       ),
     );
@@ -192,8 +229,13 @@ class OrderScreen extends StatelessWidget {
     );
 
     return Container(
-      color: color,
-      padding: EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.all(
+          Radius.circular(6.0),
+        ),
+      ),
+      padding: EdgeInsets.all(12.0),
       margin: EdgeInsets.symmetric(
         vertical: 4.0,
         horizontal: 8.0,
@@ -259,7 +301,7 @@ class OrderScreen extends StatelessWidget {
     return _buttonBuilder(
       onTap: onTap,
       color: Colors.green,
-      labelTitle: "Pay Reservation",
+      labelTitle: "Confirm Reservation",
     );
   }
 
@@ -383,7 +425,7 @@ class OrderScreen extends StatelessWidget {
                 _merchantDetailsSection(context, orderData),
                 _sectionTitle(context, "Product Details"),
                 _paymentDetailsSection(orderData),
-                _downPaymentSection(orderData),
+                _downPaymentSection(context, orderData),
                 _divider(),
                 _completeReservationButton(context, orderData),
                 _payReservationButtonSection(context, orderData),

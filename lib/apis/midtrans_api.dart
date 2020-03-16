@@ -93,18 +93,11 @@ class MidtransAPI {
   static Future<String> invokePayment({Order order, Client client}) async {
     if (order == null) return "Order must not be null";
     if (client == null) return "Client must not be null";
-    String payMsg = await _pay(order, client);
-    if (payMsg == null) {
-      print("Payment UI invoked successfully");
-      return null;
-    }
-    return "Cant Get Result";
+    return await _pay(order, client);
   }
 
-  static Future<PaymentInfo> getPaymentInfo(
-      {Order order, Client client}) async {
+  static Future<PaymentInfo> getPaymentInfo({Order order}) async {
     if (order == null) throw "Order cannot be null";
-    if (client == null) throw "Client cannot be null";
     // Base Query String
     String queryString =
         "https://api.sandbox.midtrans.com/v2/${order.orderUid}/status";
@@ -115,6 +108,11 @@ class MidtransAPI {
     });
     if (response.statusCode != 200) throw "Cannot get payment details";
     print(response.body);
-    return PaymentInfo.fromJson(json.decode(response.body));
+    try {
+      return PaymentInfo.fromJson(json.decode(response.body));
+    } catch (e) {
+      print("getPaymentInfo => ${e.toString()}");
+      throw "Payment is either pending or cancelled";
+    }
   }
 }

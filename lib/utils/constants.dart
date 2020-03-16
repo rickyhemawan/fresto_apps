@@ -50,6 +50,8 @@ const kNullPhoneNumber = "Merchant Phone Number cannot be empty";
 const kNullMenus = "Menus cannot be empty";
 const kNullMenuName = "Menu Name cannot be empty";
 const kNullPrice = "Price cannot be empty";
+const kNullPaymentInformation =
+    "Please complete the payment first, or wait for a while";
 
 // With Internet
 const kErrorUserNotRegistered = "User is not available";

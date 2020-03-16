@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fresto_apps/apis/collection_names.dart';
+import 'package:fresto_apps/models/helper/payment_info.dart';
 import 'package:fresto_apps/models/order.dart';
 import 'package:uuid/uuid.dart';
 
@@ -48,30 +49,15 @@ class OrderAPI {
     return null;
   }
 
-  static Future<String> updatePaymentStatus(
-      {@required String status, @required Order order}) async {
-    if (status == null) return "Payment Status must not be empty";
-    if (order == null) return "Order must not be empty";
-    // Creating Query for firebase
-    Map<String, dynamic> requestBody = {
-      "paymentStatus": status,
-    };
-    try {
-      await Firestore.instance
-          .collection(kOrderCollection)
-          .document(order.orderUid)
-          .updateData(requestBody);
-    } catch (e) {
-      print(e);
-      return "Error updating payment status";
-    }
-    return null;
-  }
-
-  static Future<String> updateOrderStatus(
-      {@required String status, @required Order order}) async {
+  static Future<String> updateOrderStatusAndPayment(
+      {@required String status,
+      @required Order order,
+      PaymentInfo paymentInfo,
+      String paymentStatus}) async {
     if (status == null) return "Order Status must not be empty";
     if (order == null) return "Order must not be empty";
+    if (paymentInfo != null && paymentStatus == null)
+      return "Please select a down payment first";
 
     // Creating new updated order status
     List<String> tempStatus = [];
@@ -82,6 +68,14 @@ class OrderAPI {
     Map<String, dynamic> requestBody = {
       "orderStatus": tempStatus,
     };
+
+    if (paymentInfo != null && paymentStatus != null) {
+      requestBody.addAll({
+        "paymentStatus": paymentStatus,
+        "paymentUid": paymentInfo.transactionId,
+        "paymentMethod": paymentInfo.paymentType,
+      });
+    }
 
     try {
       await Firestore.instance

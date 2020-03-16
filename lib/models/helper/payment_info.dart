@@ -6,6 +6,7 @@ class PaymentInfo {
   String paymentType;
   String transactionStatus;
   String fraudStatus;
+  String transactionId;
 
   PaymentInfo.fromJson(Map<String, dynamic> data) {
     this.totalPaid = double.parse(data["gross_amount"]);
@@ -14,6 +15,7 @@ class PaymentInfo {
     this.paymentType = data["payment_type"];
     this.transactionStatus = data["transaction_status"];
     this.fraudStatus = data["fraud_status"];
+    this.transactionId = data["transaction_id"];
   }
 
   @override
