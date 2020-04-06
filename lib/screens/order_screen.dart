@@ -8,6 +8,7 @@ import 'package:fresto_apps/components/schedule_card.dart';
 import 'package:fresto_apps/components/title_and_subtitle_row_text.dart';
 import 'package:fresto_apps/models/order.dart';
 import 'package:fresto_apps/models_data/client_data/client_data.dart';
+import 'package:fresto_apps/models_data/maps_data/map_track_data.dart';
 import 'package:fresto_apps/models_data/update_order_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
@@ -78,7 +79,7 @@ class OrderScreen extends StatelessWidget {
             Icons.location_on,
             color: Colors.orange,
           ),
-          onTap: () async => await GoogleMapAPI.openMap(
+          onTap: () async => await GoogleMapAPI.openExternalMap(
             coordinate: orderData.merchant.locationCoordinate,
           ),
         ),
@@ -355,6 +356,30 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
+  Widget _trackClientButtonSection(
+      BuildContext context, UpdateOrderData orderData) {
+    if (!orderData.isAccessedByMerchant) return SizedBox();
+    // Uncomment this section on prod
+    // if(orderData.order.orderDay != OrderDay.today) return SizedBox();
+    // if(orderData.order.lastOrderStatus != OrderStatus.kOnProgress) return SizedBox();
+
+    void onTap() {
+      print(orderData.client.email);
+      Provider.of<MapTrackData>(context).setClientAndMerchant(
+        client: orderData.client,
+        merchant: orderData.merchant,
+      );
+      Navigator.pushNamed(context, kMapTrackScreenRoute);
+      // push to track screen
+    }
+
+    return _buttonBuilder(
+      onTap: onTap,
+      color: Colors.green,
+      labelTitle: "Track Client",
+    );
+  }
+
   Widget _sectionTitle(BuildContext context, String title,
       {EdgeInsetsGeometry margin, bool setVisibility = true}) {
     if (!setVisibility) return SizedBox();
@@ -427,6 +452,7 @@ class OrderScreen extends StatelessWidget {
                 _paymentDetailsSection(orderData),
                 _downPaymentSection(context, orderData),
                 _divider(),
+                _trackClientButtonSection(context, orderData),
                 _completeReservationButton(context, orderData),
                 _payReservationButtonSection(context, orderData),
                 _approveButtonSection(context, orderData),

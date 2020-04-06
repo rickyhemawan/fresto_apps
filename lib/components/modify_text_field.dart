@@ -6,22 +6,25 @@ class ModifyTextField extends StatelessWidget {
   final String hintText;
   final Function(String result) onConfirm;
   final TextInputType keyboardType;
+  final bool isClient;
 
   ModifyTextField(
       {this.context,
       this.textController,
       this.hintText,
       this.onConfirm,
-      this.keyboardType});
+      this.keyboardType,
+      this.isClient = false});
 
   @override
   Widget build(BuildContext context) {
+    String desc = this.isClient ? "Client" : "Restaurant";
     return AlertDialog(
-      title: Text("Change Restaurant $hintText"),
+      title: Text("Change $desc $hintText"),
       content: TextField(
         controller: textController,
         keyboardType: keyboardType,
-        decoration: InputDecoration(hintText: "Restaurant $hintText"),
+        decoration: InputDecoration(hintText: "$desc $hintText"),
       ),
       actions: <Widget>[
         FlatButton(

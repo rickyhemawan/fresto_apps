@@ -77,7 +77,7 @@ class _MerchantDetailScreenState extends State<MerchantDetailScreen> {
     return SliverToBoxAdapter(
       child: InkWell(
         onTap: () async {
-          String msg = await GoogleMapAPI.openMap(
+          String msg = await GoogleMapAPI.openExternalMap(
               coordinate: merchantData.merchant.locationCoordinate);
           if (msg != null) Fluttertoast.showToast(msg: msg);
         },

@@ -35,4 +35,15 @@ class ClientAPI {
     });
     return clients;
   }
+
+  static Stream listenSingleClient({String clientUid}) {
+    final Firestore firestore = Firestore.instance;
+    if (clientUid != null) {
+      return firestore
+          .collection(kClientCollection)
+          .where("uid", isEqualTo: clientUid)
+          .snapshots();
+    }
+    return null;
+  }
 }

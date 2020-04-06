@@ -109,7 +109,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
           ),
           ListTile(
             onTap: () async {
-              String msg = await GoogleMapAPI.openMap(
+              String msg = await GoogleMapAPI.openExternalMap(
                   coordinate: orderData.merchant.locationCoordinate);
               if (msg != null) Fluttertoast.showToast(msg: msg);
             },

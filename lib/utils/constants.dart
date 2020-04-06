@@ -29,6 +29,7 @@ const kAdminModifyMerchantScreenRoute = "/admin_modify_merchant_screen_route";
 
 // Maps Route
 const kMapSearchScreenRoute = "/map_search_screen_route";
+const kMapTrackScreenRoute = '/map_track_screen_route';
 
 //---------------
 // Error Messages
@@ -105,6 +106,10 @@ enum UserType {
 
 const kPayHalf = "Pay Half";
 const kPayFull = "Pay Full";
+
+// Tracking Terms and Condition
+const kTrackingTerms =
+    'By checking the allow tracking check box and clicking "Update Account", current User is able being tracked by Fresto App. This feature improve the capability of Restaurant to estimate client location to start preparing for the reserved order. \n\nImportant note: Restaurant is capable of tracking client during 1 hour before reservation time.';
 
 // Dummy
 const kDummyCustomerName = "John Doe";

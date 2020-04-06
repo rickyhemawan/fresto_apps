@@ -1,4 +1,5 @@
 import 'package:fresto_apps/models/user.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Client extends User {
   String fullName;
@@ -35,4 +36,25 @@ class Client extends User {
         "locationCoordinate": this.locationCoordinate,
         "allowTracking": this.allowTracking,
       };
+  LatLng get position {
+    if (locationCoordinate == null) return null;
+    List<String> val = locationCoordinate.split(",");
+    return LatLng(double.parse(val[0].trim()), double.parse(val[1].trim()));
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Client &&
+          runtimeType == other.runtimeType &&
+          email == other.email &&
+          phoneNumber == other.phoneNumber &&
+          userUid == other.userUid &&
+          fullName == other.fullName &&
+          locationCoordinate == other.locationCoordinate &&
+          allowTracking == other.allowTracking;
+
+  @override
+  int get hashCode =>
+      fullName.hashCode ^ locationCoordinate.hashCode ^ allowTracking.hashCode;
 }

@@ -1,15 +1,23 @@
 import 'dart:async';
 import 'dart:math' as Math;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fresto_apps/models/client.dart';
+import 'package:fresto_apps/models/merchant.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:vector_math/vector_math.dart' as VectorMath;
 
 const kMerchantMarker = "MerchantMarker";
 const kClientMarker = "ClientMarker";
 const kMerchantCircle = "MerchantCircle";
+const kCircleRadius = 4000.0;
+
+//Dev Purpose
+const kDummyLatLng1 = LatLng(-8.507890, 115.264532);
+const kDummyLatLng2 = LatLng(-8.645105, 115.255725);
 
 class MapTrackData extends ChangeNotifier {
   // Google Map Properties
@@ -21,6 +29,10 @@ class MapTrackData extends ChangeNotifier {
   Marker _clientMarker;
   Circle _merchantCircle;
 
+  // Business Properties
+  Merchant _merchant;
+  Client _client;
+
   // Screen Properties
   bool isFetching = false;
 
@@ -30,7 +42,7 @@ class MapTrackData extends ChangeNotifier {
 
   void mapInit() {
     _controller = Completer();
-    _cameraPosition = LatLng(-8.507890, 115.264532);
+    _cameraPosition = kDummyLatLng1;
     _merchantMarker = Marker(
       draggable: false,
       markerId: MarkerId(kMerchantMarker),
@@ -39,11 +51,11 @@ class MapTrackData extends ChangeNotifier {
     _clientMarker = Marker(
       draggable: false,
       markerId: MarkerId(kClientMarker),
-      position: LatLng(-8.645105, 115.255725),
+      position: kDummyLatLng2,
     );
     _merchantCircle = Circle(
       circleId: CircleId(kMerchantCircle),
-      radius: 4000,
+      radius: kCircleRadius,
       center: _merchantMarker.position,
       visible: true,
       fillColor: Colors.blue.withOpacity(0.3),
@@ -70,23 +82,65 @@ class MapTrackData extends ChangeNotifier {
     setCameraPosition(position.target);
   }
 
-  void setMarker(Marker marker) {
-    _markers = Set<Marker>.of(<Marker>[marker]);
-    notifyListeners();
-  }
-
   void setCameraPosition(LatLng position) {
     _cameraPosition = position;
     notifyListeners();
   }
 
+  void setClientPosition(LatLng position) {
+    _client.locationCoordinate = "${position.latitude}, ${position.longitude}";
+    _clientMarker = Marker(
+      draggable: false,
+      markerId: MarkerId(kClientMarker),
+      position: position,
+    );
+    _markers = Set<Marker>.of(<Marker>[_merchantMarker, _clientMarker]);
+    notifyListeners();
+  }
+
+  void setClientAndMerchant(
+      {@required Client client, @required Merchant merchant}) {
+    if (client == null) return;
+    if (merchant == null) return;
+
+    this._merchant = merchant;
+    this._client = client;
+    notifyListeners();
+    setClientPosition(client.position);
+  }
+
   LatLng get cameraPosition => this._cameraPosition;
   Set<Marker> get markers => this._markers;
   Set<Circle> get circles => this._circles;
+  Client get client => this._client;
+
+  Client clientFromSnapshot(List<DocumentSnapshot> documents) {
+    return Client.fromJson(documents[0].data);
+  }
 
   void toggleIsFetching() {
     this.isFetching = !this.isFetching;
     notifyListeners();
+  }
+
+  bool checkClientInRadius(LatLng startPosition, LatLng endPosition) {
+    // Split the latitude and longitude
+    double lat1 = startPosition.latitude;
+    double lon1 = startPosition.longitude;
+    double lat2 = endPosition.latitude;
+    double lon2 = endPosition.longitude;
+
+    double theta = lon1 - lon2;
+    double dist = Math.sin(VectorMath.radians(lat1)) *
+            Math.sin(VectorMath.radians(lat2)) +
+        Math.cos(VectorMath.radians(lat1)) *
+            Math.cos(VectorMath.radians(lat2)) *
+            Math.cos(VectorMath.radians(theta));
+    dist = Math.acos(dist);
+    dist = VectorMath.degrees(dist);
+    dist = dist * 60 * 1.1515 * 1.609344 * 1000;
+    print("Difference is ${dist.toStringAsFixed(2)} meters");
+    return kCircleRadius < dist;
   }
 
   LatLng _getMiddlePosition(LatLng startPosition, LatLng endPosition) {
@@ -110,5 +164,10 @@ class MapTrackData extends ChangeNotifier {
     double lon3 = lon1 + Math.atan2(by, Math.cos(lat1) + bx);
 
     return LatLng(VectorMath.degrees(lat3), VectorMath.degrees(lon3));
+  }
+
+  // Dev Purpose
+  void onButtonPressed1() {
+    checkClientInRadius(_merchantMarker.position, _clientMarker.position);
   }
 }

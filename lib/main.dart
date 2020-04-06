@@ -6,6 +6,7 @@ import 'package:fresto_apps/models_data/client_data/client_data.dart';
 import 'package:fresto_apps/models_data/client_data/client_merchant_data.dart';
 import 'package:fresto_apps/models_data/client_data/client_order_timeline_data.dart';
 import 'package:fresto_apps/models_data/maps_data/map_search_data.dart';
+import 'package:fresto_apps/models_data/maps_data/map_track_data.dart';
 import 'package:fresto_apps/models_data/merchant_data/merchant_data.dart';
 import 'package:fresto_apps/models_data/merchant_data/merchant_modify_menu_data.dart';
 import 'package:fresto_apps/models_data/merchant_data/merchant_order_timeline_data.dart';
@@ -20,6 +21,7 @@ import 'package:fresto_apps/screens/create_order_screen.dart';
 import 'package:fresto_apps/screens/login_screen.dart';
 import 'package:fresto_apps/screens/main_screen.dart';
 import 'package:fresto_apps/screens/maps_screens/map_search_screen.dart';
+import 'package:fresto_apps/screens/maps_screens/map_track_screen.dart';
 import 'package:fresto_apps/screens/merchant_detail_screen.dart';
 import 'package:fresto_apps/screens/merchant_screens/merchant_add_single_menu_screen.dart';
 import 'package:fresto_apps/screens/merchant_screens/merchant_edit_single_menu_screen.dart';
@@ -50,6 +52,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(builder: (context) => ClientOrderTimelineData()),
         ChangeNotifierProvider(builder: (context) => MerchantsData()),
         ChangeNotifierProvider(builder: (context) => MapSearchData()),
+        ChangeNotifierProvider(builder: (context) => MapTrackData()),
         ChangeNotifierProvider(builder: (context) => MerchantData()),
         ChangeNotifierProvider(builder: (context) => MerchantModifyMenuData()),
         ChangeNotifierProvider(
@@ -88,6 +91,7 @@ class MyApp extends StatelessWidget {
               AdminModifyMerchantScreen(),
           //Maps
           kMapSearchScreenRoute: (context) => MapSearchScreen(),
+          kMapTrackScreenRoute: (context) => MapTrackScreen(),
         },
       ),
     );

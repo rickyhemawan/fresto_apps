@@ -25,7 +25,7 @@ class GoogleMapAPI {
         "status code: ${response.statusCode}, body: ${response.body}");
   }
 
-  static Future<String> openMap({@required String coordinate}) async {
+  static Future<String> openExternalMap({@required String coordinate}) async {
     String googleUrl =
         'https://www.google.com/maps/search/?api=1&query=$coordinate';
     if (await canLaunch(googleUrl)) {
