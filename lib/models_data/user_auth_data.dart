@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:fresto_apps/apis/client_api.dart';
+import 'package:fresto_apps/apis/device_tracking_api.dart';
 import 'package:fresto_apps/models/client.dart';
 import 'package:fresto_apps/utils/constants.dart';
 
@@ -143,6 +144,7 @@ class UserAuthData extends ChangeNotifier {
     _user = null;
     printUserDetails();
     if (context == null) return;
+    DeviceTrackingAPI().stopTracking();
     Navigator.of(context).pushNamedAndRemoveUntil(kLoginScreenRoute, _next);
   }
 

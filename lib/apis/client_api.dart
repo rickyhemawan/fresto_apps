@@ -13,6 +13,41 @@ class ClientAPI {
     return;
   }
 
+  static Future<String> updateExistingClient(
+      {@required Client currentClient, @required Client updatedClient}) async {
+    if (currentClient == null || updatedClient == null)
+      return "Nothing to update";
+    if (currentClient.userUid != updatedClient.userUid)
+      return "Client doesnt match";
+    final Firestore firestore = Firestore.instance;
+    try {
+      await firestore
+          .collection(kClientCollection)
+          .document(currentClient.userUid)
+          .setData(updatedClient.toJson());
+      return null;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  static Future<String> updateSingleClientLocation(
+      {@required String userUid, @required String locationCoordinate}) async {
+    if (userUid == null) return "User id must not be null";
+    if (locationCoordinate == null)
+      return "Location coordinate must not be null";
+    final Firestore firestore = Firestore.instance;
+    try {
+      await firestore
+          .collection(kClientCollection)
+          .document(userUid)
+          .updateData({"locationCoordinate": locationCoordinate});
+      return null;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
   static Future<Client> getCurrentClient({@required String userUid}) async {
     Client client;
     await Firestore.instance

@@ -5,8 +5,9 @@ class HeaderAppBarButton extends StatelessWidget {
   final String text;
   final Function onTap;
   final Key key;
+  final Color color;
 
-  HeaderAppBarButton({this.icon, this.text, this.onTap, this.key});
+  HeaderAppBarButton({this.icon, this.text, this.onTap, this.key, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +28,7 @@ class HeaderAppBarButton extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
+                    color: this.color,
                   ),
                 ),
               ),
@@ -36,7 +38,7 @@ class HeaderAppBarButton extends StatelessWidget {
               child: Icon(
                 icon,
                 size: 30.0,
-                color: Colors.green,
+                color: this.color ?? Colors.green,
               ),
             ),
           ],

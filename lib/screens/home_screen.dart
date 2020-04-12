@@ -3,6 +3,7 @@ import 'package:fresto_apps/components/food_card.dart';
 import 'package:fresto_apps/components/header_app_bar_button.dart';
 import 'package:fresto_apps/components/home_vertical_card.dart';
 import 'package:fresto_apps/components/overlapping_sliver_app_bar_delegate.dart';
+import 'package:fresto_apps/models_data/client_data/client_data.dart';
 import 'package:fresto_apps/models_data/merchants_data.dart';
 import 'package:fresto_apps/models_data/user_auth_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
@@ -16,11 +17,29 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  void _signOut() {
-    Provider.of<UserAuthData>(context).signOutUser(context);
-  }
-
   Widget _appBar(BuildContext context) {
+    Widget locationTrackingSection() {
+      ClientData clientData = Provider.of<ClientData>(context);
+      if (clientData.isTracking) {
+        return HeaderAppBarButton(
+          icon: Icons.location_searching,
+          text: "Device Tracking : On",
+          onTap: () => clientData.setTracking(false),
+        );
+      }
+      return HeaderAppBarButton(
+        icon: Icons.location_disabled,
+        text: "Device Tracking: Off",
+        color: Colors.grey,
+        onTap: () => clientData.setTracking(true),
+      );
+    }
+
+    void _signOut() {
+      Provider.of<UserAuthData>(context).signOutUser(context);
+      Provider.of<ClientData>(context).setTracking(false);
+    }
+
     return SliverPersistentHeader(
       pinned: true,
       delegate: OverlappingSliverAppBarDelegate(
@@ -49,10 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: <Widget>[
                     Expanded(
                       flex: 1,
-                      child: HeaderAppBarButton(
-                        icon: Icons.location_searching,
-                        text: "Update Current Location",
-                      ),
+                      child: locationTrackingSection(),
                     ),
                     VerticalDivider(
                       indent: 16.0,

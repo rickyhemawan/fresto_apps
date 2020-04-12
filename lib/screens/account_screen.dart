@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fresto_apps/components/modify_text_field.dart';
 import 'package:fresto_apps/models_data/client_data/client_data.dart';
 import 'package:fresto_apps/models_data/user_auth_data.dart';
@@ -147,6 +148,18 @@ class _AccountScreenState extends State<AccountScreen> {
       );
     }
 
+    // This button on pressed action
+    void onPressed() async {
+      clientData.setLoading(true);
+      String msg = await clientData.saveChanges();
+      clientData.setLoading(false);
+      if (msg != null) {
+        Fluttertoast.showToast(msg: msg);
+        return;
+      }
+      Fluttertoast.showToast(msg: "Account updated successfully!");
+    }
+
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -155,9 +168,7 @@ class _AccountScreenState extends State<AccountScreen> {
           color: clientData.isSameAsPrevious() ? Colors.grey : Colors.green,
           textColor: Colors.white,
           child: Text("Update Account"),
-          onPressed: () async {
-            // TODO
-          },
+          onPressed: onPressed,
         ),
       ),
     );
@@ -175,6 +186,7 @@ class _AccountScreenState extends State<AccountScreen> {
           child: Text("Sign Out"),
           onPressed: () {
             Provider.of<UserAuthData>(context).signOutUser(context);
+            Provider.of<ClientData>(context).setTracking(false);
           },
         ),
       ),

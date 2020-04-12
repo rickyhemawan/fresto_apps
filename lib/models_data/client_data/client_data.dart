@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fresto_apps/apis/client_api.dart';
+import 'package:fresto_apps/apis/device_tracking_api.dart';
 import 'package:fresto_apps/models/client.dart';
 
 class ClientData extends ChangeNotifier {
@@ -11,6 +12,7 @@ class ClientData extends ChangeNotifier {
   Client updateClient;
 
   bool isLoading = false;
+  bool isTracking = false;
 
   ClientData() {
     this.auth = FirebaseAuth.instance;
@@ -66,16 +68,54 @@ class ClientData extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateCurrentClientData() async {
+  Future<String> saveChanges() async {
+    if (isSameAsPrevious()) return "Nothing to update";
+    if (updateClient.allowTracking == null) updateClient.allowTracking = false;
+
+    // Change location if Allow tracking checked
+    if (!updateClient.allowTracking) {
+      updateClient.locationCoordinate = null;
+    } else {
+      updateClient.locationCoordinate =
+          await DeviceTrackingAPI().getDeviceLocation();
+      if (updateClient.locationCoordinate == null)
+        return "Cant get device location";
+    }
+    String res = await ClientAPI.updateExistingClient(
+        currentClient: client, updatedClient: updateClient);
+    if (res != null) return res;
+    loadClientData();
+    print("This device coordinate => ${updateClient.locationCoordinate}");
+    return null;
+  }
+
+  void loadClientData() async {
     await auth.currentUser().then((FirebaseUser user) => firebaseUser = user);
 
     if (firebaseUser == null) return;
     client = await ClientAPI.getCurrentClient(userUid: firebaseUser.uid);
     updateClient = Client.fromJson(client.toJson());
+    if (client.allowTracking == null) client.allowTracking = false;
+    if (client.allowTracking) {
+      DeviceTrackingAPI().initTracking();
+    } else {
+      DeviceTrackingAPI().stopTracking();
+    }
     notifyListeners();
   }
 
   bool isSameAsPrevious() {
     return client == updateClient;
+  }
+
+  void setLoading(bool loading) {
+    this.isLoading = loading;
+    notifyListeners();
+  }
+
+  void setTracking(bool tracking) {
+    this.isTracking = tracking;
+    DeviceTrackingAPI().setTrackStatus(tracking);
+    notifyListeners();
   }
 }

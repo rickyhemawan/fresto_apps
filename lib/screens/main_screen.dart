@@ -67,7 +67,7 @@ class _MainScreenState extends State<MainScreen>
 
   @override
   void afterFirstLayout(BuildContext context) {
-    Provider.of<ClientData>(context).updateCurrentClientData();
+    Provider.of<ClientData>(context).loadClientData();
     Provider.of<MerchantsData>(context).fetchMerchantsFromDatabase();
     Provider.of<ClientOrderTimelineData>(context).updateUserUid();
   }
