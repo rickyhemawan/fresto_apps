@@ -29,6 +29,7 @@ import 'package:fresto_apps/screens/merchant_screens/merchant_main_screen.dart';
 import 'package:fresto_apps/screens/merchant_screens/merchant_track_client_screen.dart';
 import 'package:fresto_apps/screens/order_screen.dart';
 import 'package:fresto_apps/screens/splash_screen.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
 
 import 'utils/constants.dart';
@@ -59,40 +60,42 @@ class MyApp extends StatelessWidget {
             builder: (context) => MerchantOrderTimelineData()),
         ChangeNotifierProvider(builder: (context) => UpdateOrderData()),
       ],
-      child: MaterialApp(
-        title: 'Fresto',
-        theme: ThemeData(
-          primarySwatch: Colors.green,
-          accentColor: Colors.black,
+      child: OverlaySupport(
+        child: MaterialApp(
+          title: 'Fresto',
+          theme: ThemeData(
+            primarySwatch: Colors.green,
+            accentColor: Colors.black,
+          ),
+          initialRoute: kSplashScreenRoute,
+          routes: {
+            // Client
+            kMainScreenRoute: (context) => MainScreen(),
+            kMerchantDetailScreenRoute: (context) => MerchantDetailScreen(),
+            kCreateOrderScreenRoute: (context) => CreateOrderScreen(),
+            kLoginScreenRoute: (context) => LoginScreen(),
+            kSplashScreenRoute: (context) => SplashScreen(),
+            kOrderScreenRoute: (context) => OrderScreen(),
+            // Merchant
+            kMerchantMainScreenRoute: (context) => MerchantMainScreen(),
+            kMerchantAddSingleMenuScreenRoute: (context) =>
+                MerchantAddSingleMenuScreen(),
+            kMerchantEditSingleMenuScreenRoute: (context) =>
+                MerchantEditSingleMenuScreen(),
+            kMerchantTrackClientScreenRoute: (context) =>
+                MerchantTrackClientScreen(),
+            //Admin
+            kAdminMainScreenRoute: (context) => AdminMainScreen(),
+            kAdminAddMerchantScreenRoute: (context) => AdminAddMerchantScreen(),
+            kAdminShowMerchantsScreenRoute: (context) =>
+                AdminShowMerchantsScreen(),
+            kAdminModifyMerchantScreenRoute: (context) =>
+                AdminModifyMerchantScreen(),
+            //Maps
+            kMapSearchScreenRoute: (context) => MapSearchScreen(),
+            kMapTrackScreenRoute: (context) => MapTrackScreen(),
+          },
         ),
-        initialRoute: kSplashScreenRoute,
-        routes: {
-          // Client
-          kMainScreenRoute: (context) => MainScreen(),
-          kMerchantDetailScreenRoute: (context) => MerchantDetailScreen(),
-          kCreateOrderScreenRoute: (context) => CreateOrderScreen(),
-          kLoginScreenRoute: (context) => LoginScreen(),
-          kSplashScreenRoute: (context) => SplashScreen(),
-          kOrderScreenRoute: (context) => OrderScreen(),
-          // Merchant
-          kMerchantMainScreenRoute: (context) => MerchantMainScreen(),
-          kMerchantAddSingleMenuScreenRoute: (context) =>
-              MerchantAddSingleMenuScreen(),
-          kMerchantEditSingleMenuScreenRoute: (context) =>
-              MerchantEditSingleMenuScreen(),
-          kMerchantTrackClientScreenRoute: (context) =>
-              MerchantTrackClientScreen(),
-          //Admin
-          kAdminMainScreenRoute: (context) => AdminMainScreen(),
-          kAdminAddMerchantScreenRoute: (context) => AdminAddMerchantScreen(),
-          kAdminShowMerchantsScreenRoute: (context) =>
-              AdminShowMerchantsScreen(),
-          kAdminModifyMerchantScreenRoute: (context) =>
-              AdminModifyMerchantScreen(),
-          //Maps
-          kMapSearchScreenRoute: (context) => MapSearchScreen(),
-          kMapTrackScreenRoute: (context) => MapTrackScreen(),
-        },
       ),
     );
   }

@@ -12,7 +12,7 @@
     <application
         tools:replace="android:label"
         android:theme="@style/AppTheme"
-        android:name="io.flutter.app.FlutterApplication"
+        android:name=".Application"
         android:label="fresto_apps"
         android:icon="@mipmap/ic_launcher">
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="${mapsApiKey}"/>
@@ -34,6 +34,10 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="FLUTTER_NOTIFICATION_CLICK" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
     </application>

@@ -1,9 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fresto_apps/apis/client_api.dart';
+import 'package:fresto_apps/apis/cloud_messaging_api.dart';
+import 'package:fresto_apps/apis/collection_names.dart';
 import 'package:fresto_apps/apis/device_tracking_api.dart';
 import 'package:fresto_apps/models/client.dart';
+import 'package:fresto_apps/utils/constants.dart';
 
 class ClientData extends ChangeNotifier {
   FirebaseAuth auth;
@@ -89,18 +93,34 @@ class ClientData extends ChangeNotifier {
     return null;
   }
 
-  void loadClientData() async {
+  void loadClientData({BuildContext context}) async {
     await auth.currentUser().then((FirebaseUser user) => firebaseUser = user);
 
     if (firebaseUser == null) return;
     client = await ClientAPI.getCurrentClient(userUid: firebaseUser.uid);
     updateClient = Client.fromJson(client.toJson());
+
+    // Maps
     if (client.allowTracking == null) client.allowTracking = false;
     if (client.allowTracking) {
-      DeviceTrackingAPI().initTracking();
+      DeviceTrackingAPI().initTracking(userUid: client.userUid);
     } else {
       DeviceTrackingAPI().stopTracking();
+      setTracking(false);
     }
+
+    if (context == null) {
+      notifyListeners();
+      return;
+    }
+
+    // FCM
+    String msg = await CloudMessagingAPI.configure(
+      userUid: client.userUid,
+      collectionName: kClientCollection,
+      context: context,
+    );
+    if (msg != null) Fluttertoast.showToast(msg: msg);
     notifyListeners();
   }
 
@@ -114,6 +134,17 @@ class ClientData extends ChangeNotifier {
   }
 
   void setTracking(bool tracking) {
+    if (client == null) {
+      Fluttertoast.showToast(msg: "Please wait for couple of seconds");
+      return;
+    }
+    if (client.allowTracking == null) client.allowTracking = false;
+    if (client.allowTracking == false) {
+      this.isTracking = false;
+      notifyListeners();
+      Fluttertoast.showToast(msg: kNotAllowedTracking);
+      return;
+    }
     this.isTracking = tracking;
     DeviceTrackingAPI().setTrackStatus(tracking);
     notifyListeners();

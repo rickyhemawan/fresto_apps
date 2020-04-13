@@ -7,6 +7,7 @@ MAPS_API_KEY=<your-api-key-here>
 MIDTRANS_CLIENT_KEY=<your-midtrans-client-key-here>
 MIDTRANS_SERVER_KEY=<your=midtrans-server-key-here>
 MIDTRANS_CHECKOUT_URL=<your-midtrans-server-url-here>/checkout.php/
+FCM_SERVER_KEY=<your-firebase-cloud-messaging-server-key-here>
 ```
 For further information about [Midtrans](https://midtrans.com/) payment gateway please checkout their [online documentation](https://docs.midtrans.com/en/welcome/index.html)
 

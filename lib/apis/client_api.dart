@@ -6,6 +6,7 @@ import 'package:fresto_apps/models/client.dart';
 class ClientAPI {
   static Future<void> addNewClientToDatabase(Client client) async {
     final Firestore firestore = Firestore.instance;
+    if (client.allowTracking == null) client.allowTracking = false;
     await firestore
         .collection(kClientCollection)
         .document(client.userUid)

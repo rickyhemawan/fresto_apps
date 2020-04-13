@@ -35,6 +35,8 @@ const kMapTrackScreenRoute = '/map_track_screen_route';
 // Error Messages
 //---------------
 
+const kNotAllowedTracking = "Please Activate Allow Tracking on Account Page!";
+
 // Without Internet
 const kErrorEmptyEmail = "Email cannot be empty";
 const kErrorNotValidEmailAddress = "Not a valid email address";

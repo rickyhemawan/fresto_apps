@@ -1,3 +1,4 @@
+import 'package:fresto_apps/apis/client_api.dart';
 import 'package:geolocator/geolocator.dart';
 
 class DeviceTrackingAPI {
@@ -40,8 +41,9 @@ class DeviceTrackingAPI {
     endTracking = false;
   }
 
-  void initTracking() async {
+  void initTracking({String userUid}) async {
     if (_isInstanceRunning) return;
+    if (userUid != null) _userUid = userUid;
     _isInstanceRunning = true;
     endTracking = false;
     while (!endTracking) {
@@ -54,8 +56,11 @@ class DeviceTrackingAPI {
         else {
           print("Updated device location: $currentLocation");
           previousLocation = currentLocation;
+          print("_userUid => $_userUid");
           if (_userUid != null) {
-            // TODO: Update to firebase here
+            print("uploading location to database");
+            ClientAPI.updateSingleClientLocation(
+                userUid: _userUid, locationCoordinate: exactLocation);
           }
         }
       } else
@@ -64,6 +69,7 @@ class DeviceTrackingAPI {
     }
     print("device tracking ended...");
     _userUid = null;
+    exactLocation = null;
     _isInstanceRunning = false;
   }
 }
