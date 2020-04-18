@@ -36,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     void _signOut() {
+      Provider.of<ClientData>(context).unsubscribeFCM();
       Provider.of<UserAuthData>(context).signOutUser(context);
       Provider.of<ClientData>(context).setTracking(false);
     }

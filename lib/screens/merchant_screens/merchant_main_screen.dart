@@ -57,7 +57,8 @@ class _MerchantMainScreenState extends State<MerchantMainScreen>
 
   @override
   void afterFirstLayout(BuildContext context) {
-    Provider.of<MerchantData>(context).loadCurrentMerchantData();
+    Provider.of<MerchantData>(context)
+        .loadCurrentMerchantData(context: context);
     Provider.of<MerchantOrderTimelineData>(context).updateMerchantUid();
   }
 }

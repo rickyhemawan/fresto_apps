@@ -174,7 +174,7 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 
-  Widget _logoutSection() {
+  Widget _logoutSection(ClientData clientData) {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -185,8 +185,9 @@ class _AccountScreenState extends State<AccountScreen> {
           textColor: Colors.white,
           child: Text("Sign Out"),
           onPressed: () {
+            clientData.unsubscribeFCM();
             Provider.of<UserAuthData>(context).signOutUser(context);
-            Provider.of<ClientData>(context).setTracking(false);
+            clientData.setTracking(false);
           },
         ),
       ),
@@ -220,7 +221,7 @@ class _AccountScreenState extends State<AccountScreen> {
             _allowTrackingSection(clientData),
             _trackingTerms(),
             _saveChangesSection(clientData),
-            _logoutSection(),
+            _logoutSection(clientData),
           ],
         );
       },

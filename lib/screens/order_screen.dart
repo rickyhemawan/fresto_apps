@@ -359,9 +359,10 @@ class OrderScreen extends StatelessWidget {
   Widget _trackClientButtonSection(
       BuildContext context, UpdateOrderData orderData) {
     if (!orderData.isAccessedByMerchant) return SizedBox();
-    // Uncomment this section on prod
-    // if(orderData.order.orderDay != OrderDay.today) return SizedBox();
-    // if(orderData.order.lastOrderStatus != OrderStatus.kOnProgress) return SizedBox();
+    // Comment this 2 function below on dev
+    if (orderData.order.orderDay != OrderDay.today) return SizedBox();
+    if (orderData.order.lastOrderStatus != OrderStatus.kOnProgress)
+      return SizedBox();
 
     void onTap() {
       print(orderData.client.email);

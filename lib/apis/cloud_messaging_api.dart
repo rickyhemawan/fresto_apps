@@ -43,6 +43,26 @@ class CloudMessagingAPI {
     }
   }
 
+  static Future<String> removeTokenFromUser(
+      {@required String collectionName, @required String userUid}) async {
+    if (collectionName == null) return "Cannot Connect to database";
+    if (userUid == null) return "Cannot Connect to the database";
+    final Firestore firestore = Firestore.instance;
+    try {
+      String deviceToken = await fcm.getToken();
+      await firestore
+          .collection(collectionName)
+          .document(userUid)
+          .collection(kUserTokenCollection)
+          .document(deviceToken)
+          .delete();
+      return null;
+    } catch (e) {
+      print(e.toString());
+      return "Failed to delete FCM from firestore";
+    }
+  }
+
   static Widget _buildDialog(BuildContext context, ParsedFCM parsedFCM) {
     print("_buildDialog Invoked");
     return Card(

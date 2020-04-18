@@ -60,6 +60,10 @@ class MerchantOrderTimelineData extends ChangeNotifier {
     return StreamBuilder<QuerySnapshot>(
       stream: OrderAPI.listenOrder(merchantUid: this.merchantUid),
       builder: (context, snapshot) {
+        if (snapshot.data == null) return SizedBox();
+        if (snapshot.data.documents == null) return SizedBox();
+        if (snapshot.data.documents.isEmpty) return SizedBox();
+        if (snapshot.hasError) return SizedBox();
         if (!snapshot.hasData) return SizedBox();
         List<DocumentSnapshot> documents = snapshot.data.documents;
         List<Order> orders = ordersFromSnapshots(documents);

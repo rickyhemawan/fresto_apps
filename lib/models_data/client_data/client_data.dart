@@ -124,6 +124,12 @@ class ClientData extends ChangeNotifier {
     notifyListeners();
   }
 
+  void unsubscribeFCM() async {
+    String msg = await CloudMessagingAPI.removeTokenFromUser(
+        collectionName: kClientCollection, userUid: client.userUid);
+    if (msg != null) Fluttertoast.showToast(msg: msg);
+  }
+
   bool isSameAsPrevious() {
     return client == updateClient;
   }

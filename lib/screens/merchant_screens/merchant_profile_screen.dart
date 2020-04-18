@@ -303,8 +303,10 @@ class _MerchantProfileScreenState extends State<MerchantProfileScreen> {
           color: Colors.red,
           textColor: Colors.white,
           child: Text("Sign Out"),
-          onPressed: () =>
-              Provider.of<UserAuthData>(context).signOutUser(context),
+          onPressed: () {
+            merchantData.unsubscribeFCM();
+            Provider.of<UserAuthData>(context).signOutUser(context);
+          },
         ),
       ),
     );
