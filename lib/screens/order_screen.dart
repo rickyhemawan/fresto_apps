@@ -20,7 +20,7 @@ class OrderScreen extends StatelessWidget {
       itemBuilder: (context, index) {
         return FoodCardWithQuantity(menuHelper: orderData.order.menus[index]);
       },
-      itemCount: 1,
+      itemCount: orderData.order.menus.length,
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
     );
@@ -363,8 +363,15 @@ class OrderScreen extends StatelessWidget {
     if (orderData.order.orderDay != OrderDay.today) return SizedBox();
     if (orderData.order.lastOrderStatus != OrderStatus.kOnProgress)
       return SizedBox();
+    bool isAbleToTrack = orderData.client.allowTracking;
+    print(orderData.client.allowTracking);
+    print("isAbleToTrack $isAbleToTrack");
 
     void onTap() {
+      if (!isAbleToTrack) {
+        Fluttertoast.showToast(msg: "Client doesnt allow tracking");
+        return;
+      }
       print(orderData.client.email);
       Provider.of<MapTrackData>(context).setClientAndMerchant(
         client: orderData.client,
@@ -376,7 +383,7 @@ class OrderScreen extends StatelessWidget {
 
     return _buttonBuilder(
       onTap: onTap,
-      color: Colors.green,
+      color: isAbleToTrack ? Colors.green : Colors.grey,
       labelTitle: "Track Client",
     );
   }

@@ -7,6 +7,7 @@ class ClientAPI {
   static Future<void> addNewClientToDatabase(Client client) async {
     final Firestore firestore = Firestore.instance;
     if (client.allowTracking == null) client.allowTracking = false;
+    if (client.nearFCMSent == null) client.nearFCMSent = false;
     await firestore
         .collection(kClientCollection)
         .document(client.userUid)

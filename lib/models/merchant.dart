@@ -1,5 +1,6 @@
 import 'package:fresto_apps/models/menu.dart';
 import 'package:fresto_apps/models/user.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Merchant extends User {
   String merchantName;
@@ -69,6 +70,12 @@ class Merchant extends User {
     List jsonList = List();
     list.map((item) => jsonList.add(item.toJson())).toList();
     return jsonList;
+  }
+
+  LatLng get position {
+    if (locationCoordinate == null) return null;
+    List<String> val = locationCoordinate.split(",");
+    return LatLng(double.parse(val[0].trim()), double.parse(val[1].trim()));
   }
 
   Map<String, dynamic> toJson() => {

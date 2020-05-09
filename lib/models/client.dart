@@ -5,6 +5,7 @@ class Client extends User {
   String fullName;
   String locationCoordinate;
   bool allowTracking;
+  bool nearFCMSent;
 
   Client({
     String email,
@@ -13,6 +14,7 @@ class Client extends User {
     this.fullName,
     this.locationCoordinate,
     this.allowTracking = false,
+    this.nearFCMSent = false,
   }) : super(
           userUid: userUid,
           email: email,
@@ -26,6 +28,7 @@ class Client extends User {
     this.fullName = json["fullName"];
     this.locationCoordinate = json["locationCoordinate"];
     this.allowTracking = json["allowTracking"];
+    this.nearFCMSent = json["nearFCMSent"];
   }
 
   Map<String, dynamic> toJson() => {
@@ -35,6 +38,7 @@ class Client extends User {
         "fullName": this.fullName,
         "locationCoordinate": this.locationCoordinate,
         "allowTracking": this.allowTracking,
+        "nearFCMSent": this.nearFCMSent,
       };
   LatLng get position {
     if (locationCoordinate == null) return null;

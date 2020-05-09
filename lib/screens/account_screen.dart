@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fresto_apps/components/modify_text_field.dart';
 import 'package:fresto_apps/models_data/client_data/client_data.dart';
+import 'package:fresto_apps/models_data/merchant_data/merchant_order_timeline_data.dart';
 import 'package:fresto_apps/models_data/user_auth_data.dart';
 import 'package:fresto_apps/utils/constants.dart';
 import 'package:provider/provider.dart';
@@ -158,6 +159,7 @@ class _AccountScreenState extends State<AccountScreen> {
         return;
       }
       Fluttertoast.showToast(msg: "Account updated successfully!");
+      Provider.of<MerchantOrderTimelineData>(context).reFetchClients();
     }
 
     return SliverToBoxAdapter(

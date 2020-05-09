@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'dart:math' as Math;
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fresto_apps/models/client.dart';
 import 'package:fresto_apps/models/merchant.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -28,6 +31,7 @@ class MapTrackData extends ChangeNotifier {
   Marker _merchantMarker;
   Marker _clientMarker;
   Circle _merchantCircle;
+  BitmapDescriptor _merchantIcon;
 
   // Business Properties
   Merchant _merchant;
@@ -73,6 +77,16 @@ class MapTrackData extends ChangeNotifier {
     );
   }
 
+  Future<Uint8List> getBytesFromAsset(String path, int width) async {
+    ByteData data = await rootBundle.load(path);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
+        targetWidth: width);
+    ui.FrameInfo fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))
+        .buffer
+        .asUint8List();
+  }
+
   void onMapCreated(GoogleMapController controller) {
     if (_controller.isCompleted) _controller = Completer();
     _controller.complete(controller);
@@ -98,14 +112,38 @@ class MapTrackData extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateMerchantPosition() async {
+    this.isFetching = true;
+    notifyListeners();
+    _merchantIcon = BitmapDescriptor.fromBytes(
+        await getBytesFromAsset("assets/images/merchantIcon.png", 100));
+    _merchantMarker = Marker(
+      draggable: false,
+      markerId: MarkerId(kMerchantMarker),
+      position: this._merchant.position,
+      icon: _merchantIcon,
+    );
+    _merchantCircle = Circle(
+      circleId: CircleId(kMerchantCircle),
+      radius: kCircleRadius,
+      center: _merchantMarker.position,
+      visible: true,
+      fillColor: Colors.blue.withOpacity(0.3),
+      strokeColor: Colors.blue,
+    );
+    _circles = Set<Circle>.of(<Circle>[_merchantCircle]);
+    this.isFetching = false;
+  }
+
   void setClientAndMerchant(
-      {@required Client client, @required Merchant merchant}) {
+      {@required Client client, @required Merchant merchant}) async {
     if (client == null) return;
     if (merchant == null) return;
 
     this._merchant = merchant;
     this._client = client;
     notifyListeners();
+    await updateMerchantPosition();
     setClientPosition(client.position);
   }
 

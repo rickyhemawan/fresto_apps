@@ -126,6 +126,12 @@ class MerchantOrderTimelineData extends ChangeNotifier {
     notifyListeners();
   }
 
+  void reFetchClients() {
+    this.clients = [];
+    notifyListeners();
+    getClientsFromDatabase();
+  }
+
   void updateMerchantUid() async {
     this.merchantUid = await AuthAPI.getCurrentUserUid();
     notifyListeners();
