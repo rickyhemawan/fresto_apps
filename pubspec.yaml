@@ -29,7 +29,9 @@ dependencies:
   csv: ^4.0.3
   after_layout: ^1.0.7+2
   flutter_picker: ^1.1.0
-  flutter_datetime_picker: ^1.3.4
+  flutter_datetime_picker:
+    git:
+      url: https://github.com/derohimat/flutter_datetime_picker.git
   dotenv: ^2.0.0
   geocoder: ^0.2.1
   url_launcher: ^5.4.1

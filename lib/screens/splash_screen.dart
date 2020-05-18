@@ -1,3 +1,4 @@
+import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fresto_apps/models_data/user_auth_data.dart';
@@ -8,7 +9,7 @@ class SplashScreen extends StatefulWidget {
   _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen> with AfterLayoutMixin {
   @override
   void initState() {
     super.initState();
@@ -19,7 +20,6 @@ class _SplashScreenState extends State<SplashScreen> {
     ScreenUtil.instance = ScreenUtil.getInstance()..init(context);
     ScreenUtil.instance =
         ScreenUtil(width: 750, height: 1334, allowFontScaling: true);
-    Provider.of<UserAuthData>(context).nextPage(context);
     return Scaffold(
       backgroundColor: Colors.green,
       body: Container(
@@ -44,5 +44,10 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void afterFirstLayout(BuildContext context) {
+    Provider.of<UserAuthData>(context).nextPage(context);
   }
 }

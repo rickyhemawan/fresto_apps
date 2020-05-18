@@ -60,7 +60,8 @@ const kNullPaymentInformation =
 const kErrorUserNotRegistered = "User is not available";
 const kErrorWrongEmailOrPassword = "Wrong Email or Password";
 const kErrorCreateUserFailed = "Cannot Create this User";
-const kErrorEmailAlreadyInUse = "Email is already in use";
+const kErrorFailedRegistration =
+    "Credential is Invalid, Weak Password or Email in Use";
 const kErrorFailedUploadImage = "Error uploading image";
 const kErrorFailedToUpdateMenus = "Error updating menus";
 

@@ -205,7 +205,7 @@ class UserAuthData extends ChangeNotifier {
     } catch (e) {
       print(e);
       disableLoading();
-      return kErrorEmailAlreadyInUse;
+      return kErrorFailedRegistration;
     }
     disableLoading();
     return null;
